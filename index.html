@@ -151,6 +151,7 @@ repos.enqueue(new Callback&lt;List&lt;Repo&gt;&gt;){
 <li><p>Streaming<br>用来指定Response body为字节数组形式返回</p>
 </li>
 <li><p>URL<br>用来指定完整路径</p>
+<p><img src="/images/retrofit_class.png" alt=""></p>
 </li>
 </ul>
 <h3 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h3><p>首先先构建一个Retrofit对象，从构建方式可以看出，使用的是设计模式中的Builder模式，Builder模式用于构建复杂的对象，并将构建过程和它的部件解耦，使用户在不知道内部构建细节的情况下精细的控制对象的构建流程。</p>
