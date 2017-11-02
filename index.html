@@ -76,6 +76,10 @@
   <time datetime="2017-11-02T12:09:56.000Z" itemprop="datePublished">2017-11-02</time>
 </a>
       
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/android/">android</a>
+  </div>
+
       
     </div>
     <div class="article-entry" itemprop="articleBody">
@@ -148,7 +152,7 @@
 </li>
 </ul>
 <h3 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h3><p>首先先构建一个Retrofit对象，从构建方式可以看出，使用的是设计模式中的Builder模式，Builder模式用于构建复杂的对象，并将构建过程和它的部件解耦，使用户在不知道内部构建细节的情况下精细的控制对象的构建流程。</p>
-<p>最后在build()方法中设置相关参数，如果未设置callFactory会构造默认的okHttpClient对象，其余的则默认构造Platform类的默认方法获取相关对象，然后将相关参数通过Retrofit类的构造方法构造出Retrofit对象</p>
+<p>最后在build方法中设置相关参数，如果未设置callFactory会构造默认的okHttpClient对象，其余的则默认构造Platform类的默认方法获取相关对象，然后将相关参数通过Retrofit类的构造方法构造出Retrofit对象</p>
 <p><img src="/images/retrofit_build.png" alt=""></p>
 <p>通过Retrofit类的create方法，返回一个动态代理的对象，这里涉及到涉及模式中的代理模式，也称为委托模式，相关代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">public &lt;T&gt; T create(final Class&lt;T&gt; service) &#123;</div><div class="line">  Utils.validateServiceInterface(service);</div><div class="line">  if (validateEagerly) &#123;</div><div class="line">    eagerlyValidateMethods(service);</div><div class="line">  &#125;</div><div class="line">  return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class&lt;?&gt;[] &#123; service &#125;,</div><div class="line">      new InvocationHandler() &#123;</div><div class="line">        private final Platform platform = Platform.get();</div><div class="line"></div><div class="line">        @Override public Object invoke(Object proxy, Method method, Object... args)</div><div class="line">            throws Throwable &#123;</div><div class="line">          // If the method is a method from Object then defer to normal invocation.</div><div class="line">          if (method.getDeclaringClass() == Object.class) &#123;</div><div class="line">            return method.invoke(this, args);</div><div class="line">          &#125;</div><div class="line">          if (platform.isDefaultMethod(method)) &#123;</div><div class="line">            return platform.invokeDefaultMethod(method, service, proxy, args);</div><div class="line">          &#125;</div><div class="line">          ServiceMethod serviceMethod = loadServiceMethod(method);</div><div class="line">          OkHttpCall okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);</div><div class="line">          return serviceMethod.callAdapter.adapt(okHttpCall);</div><div class="line">        &#125;</div><div class="line">      &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>首先调用工具类方法validateServiceInterface()验证接口,这里将会验证传进来的类是否是接口类型，如果不是则报出“API申明必须是接口”的无效参数异常，如果是接口，则继续检查该类是否实现了其它接口，如果是，则报出“API 接口不能是其它接口延伸的”的无效参数异常  </p>
