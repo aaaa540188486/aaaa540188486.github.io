@@ -155,53 +155,11 @@ repos.enqueue(new Callback&lt;List&lt;Repo&gt;&gt;){
 </ul>
 <h3 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h3><p>首先先构建一个Retrofit对象，从构建方式可以看出，使用的是设计模式中的Builder模式，Builder模式用于构建复杂的对象，并将构建过程和它的部件解耦，使用户在不知道内部构建细节的情况下精细的控制对象的构建流程。</p>
 <p>最后在build()方法中设置相关参数，如果未设置callFactory会构造默认的okHttpClient对象，其余的则默认构造Platform类的默认方法获取相关对象，然后将相关参数通过Retrofit类的构造方法构造出Retrofit对象</p>
-<p>通过Retrofit类的create方法，返回一个动态代理的对象，这里涉及到涉及模式中的代理模式，也称为委托模式，相关代码如下：<br>``public <t> T create(final Class<t> service) {<br>  Utils.validateServiceInterface(service);<br>  if (validateEagerly) {<br>    eagerlyValidateMethods(service);<br>  }<br>  return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class&lt;?&gt;[] { service },<br>      new InvocationHandler() {<br>        private final Platform platform = Platform.get();</t></t></p>
-<pre><code>  @Override public Object invoke(Object proxy, Method method, Object... args)
-      throws Throwable {
-    // If the method is a method from Object then defer to normal invocation.
-    if (method.getDeclaringClass() == Object.class) {
-      return method.invoke(this, args);
-    }
-    if (platform.isDefaultMethod(method)) {
-      return platform.invokeDefaultMethod(method, service, proxy, args);
-    }
-    ServiceMethod serviceMethod = loadServiceMethod(method);
-    OkHttpCall okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);
-    return serviceMethod.callAdapter.adapt(okHttpCall);
-  }
-});
-</code></pre><p>}``</p>
+<p>通过Retrofit类的create方法，返回一个动态代理的对象，这里涉及到涉及模式中的代理模式，也称为委托模式，相关代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">public &lt;T&gt; T create(final Class&lt;T&gt; service) &#123;</div><div class="line">  Utils.validateServiceInterface(service);</div><div class="line">  if (validateEagerly) &#123;</div><div class="line">    eagerlyValidateMethods(service);</div><div class="line">  &#125;</div><div class="line">  return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class&lt;?&gt;[] &#123; service &#125;,</div><div class="line">      new InvocationHandler() &#123;</div><div class="line">        private final Platform platform = Platform.get();</div><div class="line"></div><div class="line">        @Override public Object invoke(Object proxy, Method method, Object... args)</div><div class="line">            throws Throwable &#123;</div><div class="line">          // If the method is a method from Object then defer to normal invocation.</div><div class="line">          if (method.getDeclaringClass() == Object.class) &#123;</div><div class="line">            return method.invoke(this, args);</div><div class="line">          &#125;</div><div class="line">          if (platform.isDefaultMethod(method)) &#123;</div><div class="line">            return platform.invokeDefaultMethod(method, service, proxy, args);</div><div class="line">          &#125;</div><div class="line">          ServiceMethod serviceMethod = loadServiceMethod(method);</div><div class="line">          OkHttpCall okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);</div><div class="line">          return serviceMethod.callAdapter.adapt(okHttpCall);</div><div class="line">        &#125;</div><div class="line">      &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>首先调用工具类方法validateServiceInterface()验证接口,这里将会验证传进来的类是否是接口类型，如果不是则报出“API申明必须是接口”的无效参数异常，如果是接口，则继续检查该类是否实现了其它接口，如果是，则报出“API 接口不能是其它接口延伸的”的无效参数异常  </p>
-<p><code>static &lt;T&gt; void validateServiceInterface(Class&lt;T&gt; service) {  
-  if (!service.isInterface()) {  
-    throw new IllegalArgumentException(&quot;API declarations must be interfaces.&quot;);  
-  }  
-  // Prevent API interfaces from extending other interfaces. This not only avoids a bug in  
-  // Android (http://b.android.com/58753) but it forces composition of API declarations which is  
-  // the recommended pattern.  
-  if (service.getInterfaces().length &gt; 0) {  
-    throw new IllegalArgumentException(&quot;API interfaces must not extend other interfaces.&quot;);  
-  }  
-}</code> </p>
-<p>然后通过eagerlyValidateMethods()方法的loadServiceMethod()方法生成serviceMethod对象并一起存入缓存map中，通过platform这个类进行平台判断，对java8 特性 default method 方法做了兼容处理，这里做了个同步锁，防止多线程下重复put ServiceMethod对象。<br><code>private void eagerlyValidateMethods(Class&lt;?&gt; service) {
-  Platform platform = Platform.get();
-  for (Method method : service.getDeclaredMethods()) {
-    if (!platform.isDefaultMethod(method)) {
-      loadServiceMethod(method);
-    }
-  }
-}
-ServiceMethod loadServiceMethod(Method method) {
-  ServiceMethod result;
-  synchronized (serviceMethodCache) {
-    result = serviceMethodCache.get(method);
-    if (result == null) {
-      result = new ServiceMethod.Builder(this, method).build();
-      serviceMethodCache.put(method, result);
-    }
-  }
-  return result;
-}</code><br>当执行阶段时，okHttpCall 会调用enqueue()方法，内部调用createRawCall() 方法生成okhttp3.Call对象，通过ServiceMethod实例的toRequest()方法将相关信息由RequestBuilder类构建成Request类请求并通过okHttpCall真正调用okhttp3发送请求。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">static &lt;T&gt; void validateServiceInterface(Class&lt;T&gt; service) &#123;  </div><div class="line">  if (!service.isInterface()) &#123;  </div><div class="line">    throw new IllegalArgumentException(&quot;API declarations must be interfaces.&quot;);  </div><div class="line">  &#125;  </div><div class="line">  // Prevent API interfaces from extending other interfaces. This not only avoids a bug in  </div><div class="line">  // Android (http://b.android.com/58753) but it forces composition of API declarations which is  </div><div class="line">  // the recommended pattern.  </div><div class="line">  if (service.getInterfaces().length &gt; 0) &#123;  </div><div class="line">    throw new IllegalArgumentException(&quot;API interfaces must not extend other interfaces.&quot;);  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后通过eagerlyValidateMethods()方法的loadServiceMethod()方法生成serviceMethod对象并一起存入缓存map中，通过platform这个类进行平台判断，对java8 特性 default method 方法做了兼容处理，这里做了个同步锁，防止多线程下重复put ServiceMethod对象。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">private void eagerlyValidateMethods(Class&lt;?&gt; service) &#123;</div><div class="line">  Platform platform = Platform.get();</div><div class="line">  for (Method method : service.getDeclaredMethods()) &#123;</div><div class="line">    if (!platform.isDefaultMethod(method)) &#123;</div><div class="line">      loadServiceMethod(method);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">ServiceMethod loadServiceMethod(Method method) &#123;</div><div class="line">  ServiceMethod result;</div><div class="line">  synchronized (serviceMethodCache) &#123;</div><div class="line">    result = serviceMethodCache.get(method);</div><div class="line">    if (result == null) &#123;</div><div class="line">      result = new ServiceMethod.Builder(this, method).build();</div><div class="line">      serviceMethodCache.put(method, result);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  return result;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>当执行阶段时，okHttpCall 会调用enqueue()方法，内部调用createRawCall() 方法生成okhttp3.Call对象，通过ServiceMethod实例的toRequest()方法将相关信息由RequestBuilder类构建成Request类请求并通过okHttpCall真正调用okhttp3发送请求。</p>
 
       
     </div>
