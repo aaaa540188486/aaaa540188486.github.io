@@ -83,30 +83,24 @@
         <h3 id="简介："><a href="#简介：" class="headerlink" title="简介："></a>简介：</h3><p>Retrofit 是Square公司推出的一个类型安全的Http的适应于Android,java客户端的框架</p>
 <h3 id="下载："><a href="#下载：" class="headerlink" title="下载："></a>下载：</h3><p>Gradle: compile ‘com.squareup.retrofit2:retrofit:2.1.0’<br>要求 java7, Android2.3以上<br>官网：<a href="http://square.github.io/retrofit/" target="_blank" rel="external">http://square.github.io/retrofit/</a>  </p>
 <h3 id="使用："><a href="#使用：" class="headerlink" title="使用："></a>使用：</h3><ol>
-<li>申明一个API接口<br><code>public interface GitHubService {
- @GET(&quot;users/{user}/repos&quot;)
- Call&lt;List&lt;Repo&gt;&gt;listRepos(@Path(&quot;user&quot;) String user);
-}</code></li>
-<li>使用Retrofit类实现这个接口<br><code>Retrofit retrofit = new Retrofit.Builder()
-.baseUrl(&quot;https://api.github.com/&quot;)
-.build();
-GitHubService service = retrofit.create(GitHubService.class);</code></li>
-<li>同步或异步向服务器发送http请求<br><code>Call&lt;List&lt;Repo&gt;&gt; repos = service.listRepos(&quot;octocat&quot;);
-repos.enqueue(new Callback&lt;List&lt;Repo&gt;&gt;){
-  @Override
-  public void onResponse(Response&lt;List&lt;Repo&gt;&gt; response,Retrofit retrofit){
-  }
-  @Override
-  public void onFailure(Throwable t){
-  }
-}</code></li>
+<li><p>申明一个API接口  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public interface GitHubService &#123;</div><div class="line">    @GET(&quot;users/&#123;user&#125;/repos&quot;)</div><div class="line">    Call&lt;List&lt;Repo&gt;&gt;listRepos(@Path(&quot;user&quot;) String user);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>使用Retrofit类实现这个接口  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Retrofit retrofit = new Retrofit.Builder()</div><div class="line">.baseUrl(&quot;https://api.github.com/&quot;)</div><div class="line">.build();</div><div class="line">GitHubService service = retrofit.create(GitHubService.class);</div></pre></td></tr></table></figure>
+</li>
+<li><p>同步或异步向服务器发送http请求  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Call&lt;List&lt;Repo&gt;&gt; repos = service.listRepos(&quot;octocat&quot;);</div><div class="line">repos.enqueue(new Callback&lt;List&lt;Repo&gt;&gt;)&#123;</div><div class="line">     @Override</div><div class="line">     public void onResponse(Response&lt;List&lt;Repo&gt;&gt; response,Retrofit retrofit)&#123;</div><div class="line">     &#125;</div><div class="line">     @Override</div><div class="line">     public void onFailure(Throwable t)&#123;</div><div class="line">     &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
 </ol>
 <h3 id="使用注解描述请求"><a href="#使用注解描述请求" class="headerlink" title="使用注解描述请求"></a>使用注解描述请求</h3><ul>
 <li>支持URL参数和请求参数</li>
 <li>请求实体对象转换</li>
 <li>多种请求实体和文件上传</li>
 </ul>
-<h3 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h3><p>其中http包为各种注解<br><img src="/images/retrofit_http.png" alt=""><br><img src="/images/retrofit_class.png" alt=""></p>
+<h3 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h3><p>其中http包为各种注解  </p>
+<figure class="half"><br>    <img src="/images/retrofit_http.png"><br>    <img src="/images/retrofit_class.png"><br></figure>
+
 <ul>
 <li><p>Body<br>用来指定POST或PUT请求里以实体形式发送的请求方法的参数，对象将会被序列化并放在请求body中  </p>
 </li>
