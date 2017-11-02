@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="koala&#39;s Blog">
 <meta property="og:description" content="简介：Retrofit 是Square公司推出的一个类型安全的Http的适应于Android,java客户端的框架 下载：Gradle: compile ‘com.squareup.retrofit2:retrofit:2.1.0’要求 java7, Android2.3以上官网：http://square.github.io/retrofit/   使用： 申明一个API接口public int">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-11-02T12:58:52.000Z">
+<meta property="og:updated_time" content="2017-11-02T13:10:22.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信框架-Retrofit">
 <meta name="twitter:description" content="简介：Retrofit 是Square公司推出的一个类型安全的Http的适应于Android,java客户端的框架 下载：Gradle: compile ‘com.squareup.retrofit2:retrofit:2.1.0’要求 java7, Android2.3以上官网：http://square.github.io/retrofit/   使用： 申明一个API接口public int">
@@ -155,16 +155,16 @@ repos.enqueue(new Callback&lt;List&lt;Repo&gt;&gt;){
 });
 </code></pre><p>}</p>
 <p>首先调用工具类方法validateServiceInterface()验证接口,这里将会验证传进来的类是否是接口类型，如果不是则报出“API申明必须是接口”的无效参数异常，如果是接口，则继续检查该类是否实现了其它接口，如果是，则报出“API 接口不能是其它接口延伸的”的无效参数异常</p>
-<p><code>static &lt;T&gt; void validateServiceInterface(Class&lt;T&gt; service) {
-  if (!service.isInterface()) {
-    throw new IllegalArgumentException(&quot;API declarations must be interfaces.&quot;);
-  }
-  // Prevent API interfaces from extending other interfaces. This not only avoids a bug in
-  // Android (http://b.android.com/58753) but it forces composition of API declarations which is
-  // the recommended pattern.
-  if (service.getInterfaces().length &gt; 0) {
-    throw new IllegalArgumentException(&quot;API interfaces must not extend other interfaces.&quot;);
-  }
+<p><code>static &lt;T&gt; void validateServiceInterface(Class&lt;T&gt; service) {  
+  if (!service.isInterface()) {  
+    throw new IllegalArgumentException(&quot;API declarations must be interfaces.&quot;);  
+  }  
+  // Prevent API interfaces from extending other interfaces. This not only avoids a bug in  
+  // Android (http://b.android.com/58753) but it forces composition of API declarations which is  
+  // the recommended pattern.  
+  if (service.getInterfaces().length &gt; 0) {  
+    throw new IllegalArgumentException(&quot;API interfaces must not extend other interfaces.&quot;);  
+  }  
 }</code><br>然后通过eagerlyValidateMethods()方法的loadServiceMethod()方法生成serviceMethod对象并一起存入缓存map中，通过platform这个类进行平台判断，对java8 特性 default method 方法做了兼容处理，这里做了个同步锁，防止多线程下重复put ServiceMethod对象。</p>
 <p><code>private void eagerlyValidateMethods(Class&lt;?&gt; service) {
   Platform platform = Platform.get();
@@ -198,15 +198,6 @@ ServiceMethod loadServiceMethod(Method method) {
   </div>
   
     
-<nav id="article-nav">
-  
-  
-    <a href="/2017/08/22/test/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">test&nbsp;<span>&gt;</span></div>
-    </a>
-  
-</nav>
-
   
 </article>
 

@@ -155,16 +155,16 @@ repos.enqueue(new Callback&lt;List&lt;Repo&gt;&gt;){
 });
 </code></pre><p>}</p>
 <p>首先调用工具类方法validateServiceInterface()验证接口,这里将会验证传进来的类是否是接口类型，如果不是则报出“API申明必须是接口”的无效参数异常，如果是接口，则继续检查该类是否实现了其它接口，如果是，则报出“API 接口不能是其它接口延伸的”的无效参数异常</p>
-<p><code>static &lt;T&gt; void validateServiceInterface(Class&lt;T&gt; service) {
-  if (!service.isInterface()) {
-    throw new IllegalArgumentException(&quot;API declarations must be interfaces.&quot;);
-  }
-  // Prevent API interfaces from extending other interfaces. This not only avoids a bug in
-  // Android (http://b.android.com/58753) but it forces composition of API declarations which is
-  // the recommended pattern.
-  if (service.getInterfaces().length &gt; 0) {
-    throw new IllegalArgumentException(&quot;API interfaces must not extend other interfaces.&quot;);
-  }
+<p><code>static &lt;T&gt; void validateServiceInterface(Class&lt;T&gt; service) {  
+  if (!service.isInterface()) {  
+    throw new IllegalArgumentException(&quot;API declarations must be interfaces.&quot;);  
+  }  
+  // Prevent API interfaces from extending other interfaces. This not only avoids a bug in  
+  // Android (http://b.android.com/58753) but it forces composition of API declarations which is  
+  // the recommended pattern.  
+  if (service.getInterfaces().length &gt; 0) {  
+    throw new IllegalArgumentException(&quot;API interfaces must not extend other interfaces.&quot;);  
+  }  
 }</code><br>然后通过eagerlyValidateMethods()方法的loadServiceMethod()方法生成serviceMethod对象并一起存入缓存map中，通过platform这个类进行平台判断，对java8 特性 default method 方法做了兼容处理，这里做了个同步锁，防止多线程下重复put ServiceMethod对象。</p>
 <p><code>private void eagerlyValidateMethods(Class&lt;?&gt; service) {
   Platform platform = Platform.get();
@@ -186,95 +186,6 @@ ServiceMethod loadServiceMethod(Method method) {
   return result;
 }</code></p>
 <p>当执行阶段时，okHttpCall 会调用enqueue()方法，内部调用createRawCall() 方法生成okhttp3.Call对象，通过ServiceMethod实例的toRequest()方法将相关信息由RequestBuilder类构建成Request类请求并通过okHttpCall真正调用okhttp3发送请求。</p>
-
-      
-    </div>
-    
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-    
-      <article id="post-test" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/22/test/">test</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      <a href="/2017/08/22/test/" class="article-date">
-  <time datetime="2017-08-22T14:30:11.000Z" itemprop="datePublished">2017-08-22</time>
-</a>
-      
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        
-      
-    </div>
-    
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-    
-      <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/22/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      <a href="/2017/08/22/hello-world/" class="article-date">
-  <time datetime="2017-08-22T14:15:23.000Z" itemprop="datePublished">2017-08-22</time>
-</a>
-      
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
 
       
     </div>
