@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="koala&#39;s Blog">
 <meta property="og:description" content="简介：Retrofit 是Square公司推出的一个类型安全的Http的适应于Android,java客户端的框架 下载：Gradle: compile ‘com.squareup.retrofit2:retrofit:2.1.0’要求 java7, Android2.3以上官网：http://square.github.io/retrofit/   使用： 申明一个API接口public int">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-11-02T13:10:22.000Z">
+<meta property="og:updated_time" content="2017-11-02T13:14:39.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络通信框架-Retrofit">
 <meta name="twitter:description" content="简介：Retrofit 是Square公司推出的一个类型安全的Http的适应于Android,java客户端的框架 下载：Gradle: compile ‘com.squareup.retrofit2:retrofit:2.1.0’要求 java7, Android2.3以上官网：http://square.github.io/retrofit/   使用： 申明一个API接口public int">
@@ -118,23 +118,40 @@ repos.enqueue(new Callback&lt;List&lt;Repo&gt;&gt;){
 </li>
 <li><p>FormUrlEncoded<br>用来指定一个Url被加密，使请求带有application/x-www-form-urlencoded MIME 类型<br>键值对将会由之前的UTF-8编码RFC-3986</p>
 </li>
-<li>GET<br>用来指定一个GET请求</li>
-<li>HEAD<br>用来指定一个HEAD请求</li>
-<li>Header<br>用来指定请求头部参数，如果有重复，不会被重写，会被同时包含在头文件里</li>
-<li>Headers<br>用来指定头部键值对信息</li>
-<li>HTTP<br>用来指定HTTP形式请求</li>
-<li>Multipart<br>表示请求实体为多个，每部分使用@Part注解在参数中声明</li>
-<li>OPTIONS<br>用来指定一个OPTIOINS请求</li>
-<li>Part<br>用来指定含有多个部分请求的一个部分</li>
-<li>PartMap<br>表示键值对部分</li>
-<li>PATCH<br>用来指定一个PATCH请求</li>
-<li>Path<br>用来在参数中指定url被替换的部分</li>
-<li>POST<br>用来指定一个POST请求</li>
-<li>PUT<br>用来指定一个PUT请求</li>
-<li>Query<br>用来指定Url路径的查询键值对参数</li>
-<li>QueryMap<br>用来指定Url路径的查询键值对</li>
-<li>Streaming<br>用来指定Response body为字节数组形式返回</li>
-<li>URL<br>用来指定完整路径</li>
+<li><p>GET<br>用来指定一个GET请求</p>
+</li>
+<li><p>HEAD<br>用来指定一个HEAD请求</p>
+</li>
+<li><p>Header<br>用来指定请求头部参数，如果有重复，不会被重写，会被同时包含在头文件里</p>
+</li>
+<li><p>Headers<br>用来指定头部键值对信息</p>
+</li>
+<li><p>HTTP<br>用来指定HTTP形式请求</p>
+</li>
+<li><p>Multipart<br>表示请求实体为多个，每部分使用@Part注解在参数中声明</p>
+</li>
+<li><p>OPTIONS<br>用来指定一个OPTIOINS请求</p>
+</li>
+<li><p>Part<br>用来指定含有多个部分请求的一个部分</p>
+</li>
+<li><p>PartMap<br>表示键值对部分</p>
+</li>
+<li><p>PATCH<br>用来指定一个PATCH请求</p>
+</li>
+<li><p>Path<br>用来在参数中指定url被替换的部分</p>
+</li>
+<li><p>POST<br>用来指定一个POST请求</p>
+</li>
+<li><p>PUT<br>用来指定一个PUT请求</p>
+</li>
+<li><p>Query<br>用来指定Url路径的查询键值对参数</p>
+</li>
+<li><p>QueryMap<br>用来指定Url路径的查询键值对</p>
+</li>
+<li><p>Streaming<br>用来指定Response body为字节数组形式返回</p>
+</li>
+<li><p>URL<br>用来指定完整路径</p>
+</li>
 </ul>
 <h3 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h3><p>首先先构建一个Retrofit对象，从构建方式可以看出，使用的是设计模式中的Builder模式，Builder模式用于构建复杂的对象，并将构建过程和它的部件解耦，使用户在不知道内部构建细节的情况下精细的控制对象的构建流程。</p>
 <p>最后在build()方法中设置相关参数，如果未设置callFactory会构造默认的okHttpClient对象，其余的则默认构造Platform类的默认方法获取相关对象，然后将相关参数通过Retrofit类的构造方法构造出Retrofit对象</p>
