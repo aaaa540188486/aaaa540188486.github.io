@@ -57,6 +57,78 @@
   </div>
 </header>
     <section id="main" class="outer">
+      <article id="post-Git" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/02/26/Git/">Git常用使用场景和命令</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/02/26/Git/" class="article-date">
+  <time datetime="2018-02-25T22:17:52.000Z" itemprop="datePublished">2018-02-26</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/VCS/">VCS</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Git 是一个版本控制工具，除了git外还有其他版本控制工具，例如svn,主要是用来解决不同系统不同开发者分工协作的问题，git是一个分布式版本控制系统，每次克隆都将仓库代码完整镜像下来，也是对代码仓库的一次备份，正因如此，git可以在本地进行工作任务处理。相比其它版本控制工具，git以每次提交的文件快照作为处理，而不是以每一次文件的差异性作为信息保存。<br>官网：<a href="https://git-scm.com/" target="_blank" rel="external">https://git-scm.com/</a>  </p>
+<h3 id="常用命令以及场景"><a href="#常用命令以及场景" class="headerlink" title="常用命令以及场景"></a>常用命令以及场景</h3><ol>
+<li><p>环境设置<br>通过下面命令设置git confit 命令设置提交的用户信息，通过 git config –list 命令可列出配置信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git config --global user.name &quot;John Doe&quot;</div><div class="line">git config --global user.email johndoe@example.com</div></pre></td></tr></table></figure>
+</li>
+<li><p>项目建立<br>有两种方式可以开始项目，第一种是本地新建项目推送到远程代码仓库，第二种是通过远程仓库克隆到本地进行工作<br>执行下面命令进行代码仓库初始化,并会生成.git隐藏文件,该文件包含了git相关信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git init （本地项目目录下初始化）</div><div class="line">git clone *** (远程仓库克隆项目到本地，***代表代码仓库地址)</div></pre></td></tr></table></figure>
+</li>
+<li><p>提交工作<br>修改完代码后，先将文件添加到暂存区，然后检查文件状态，最后整理好提交信息提交代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">git add . (添加所有文件到暂存区)</div><div class="line">git status -s(文件状态简览)</div><div class="line">git diff (查看所有文件修改)</div><div class="line">git reset HEAD *** (撤销已暂存文件修改，***代表文件路径)</div><div class="line">git checkout *** (撤销未暂存文件修改，***代表文件路径)</div><div class="line">git comit -m &quot;commit info&quot;(提交代码)</div><div class="line">git commit -amend -m &quot;commit info&quot;(修改上一次提交信息)</div></pre></td></tr></table></figure>
+</li>
+<li><p>分支管理<br>当项目有了不同特性需求后，需要多个版本时，这时用到了git分支相关功能</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">git ls-remote （查看项目远程仓库分支）</div><div class="line">git branch (查看本地分支)</div><div class="line">git branch *** (创建分支，***代表分支名)</div><div class="line">git branch -d *** (删除本地分支，***代表分支名)</div><div class="line">git branch -D *** (强制删除本地分支，***代表分支名)</div><div class="line">git push origin --delete branchname (删除远程分支)</div><div class="line">git push origin *** (推送分支到远程代码仓库，***代表分支名)</div><div class="line">git checkout -b *** origin/*** (拉取远程分支代码到本地分支，***代表分支名)</div></pre></td></tr></table></figure>
+</li>
+<li><p>推拉远程代码<br>当项目多人进行工作时，需要拉取最新代码，以及推送自己代码到远程代码仓库,remote代表远程仓库根目录，branch代表分支名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git pull (remote)(branch) </div><div class="line">git push (remote)(branch)</div></pre></td></tr></table></figure>
+</li>
+<li><p>回滚代码<br>当项目代码出现问题时，需要返回以前版本的代码时，可通过下面命令进行代码回滚</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git reset --hard *** (*** 代表回滚地方的代码提交id)</div></pre></td></tr></table></figure>
+</li>
+<li><p>标签管理<br>当代码需要标记，或者版本需要标记时，可在提交处打上标签进行代码管理</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">git tag (列出标签)</div><div class="line">git tag *** (新建轻量标签，***代表标签名)</div><div class="line">git tag -a *** -m &quot;tag info&quot; (新建附注标签)</div><div class="line">git tag -a tagname commitId (补签，tagname表示标签名，commitId表示补签提交的id)</div><div class="line">git tag show ***（查看标签信息，***代表标签名）</div><div class="line">git push origin *** (推送标签到远程仓库共，***代表标签名享)</div><div class="line">git push origin -tags (推送所有标签)</div><div class="line">git checkout -b branchname tagname (检出标签到新建分支，branchname表示分支名，tagname表示标签名)</div></pre></td></tr></table></figure>
+</li>
+<li><p>分支合并<br>开发过程中，会因为项目特性，需求，以及bug等原因需要开多个分支进行编码处理，当处理完之后则需要合并到稳定分支或线上分支上，这里有两种方式，一是合并分支，二是变基分支。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git merge branchname (合并分支会将两个分支的末端提交和共同的祖先提交进行三方合并形成新的分支)</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>变基分支则需要多个步骤，假设主分支为master, 被合并的分支为 branch1,先切换到branch1分支进行变基，然后再切换到主分支进行快进合并,变基分支和合并分支不同的特点在于它是相当于在主分支上重新建立分支上的修改提交，在log上显的更加清晰一些，要注意的是，避免在协作过程中将已经推送的提交进行变基操作。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">git checkout branch1</div><div class="line">git rebase master</div><div class="line">git checkout master</div><div class="line">git merge branch1</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+    
       <article id="post-网络通信框架-Retrofit" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -180,7 +252,7 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2017 Koala&nbsp;
+      &copy; 2018 Koala&nbsp;
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
     </div>
   </div>
