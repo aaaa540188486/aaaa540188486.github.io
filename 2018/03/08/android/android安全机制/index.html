@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>android安全机制 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:android 通过代码混淆，应用权限，应用签名，虚拟机隔离等多种手段保护应用的安全。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android安全机制">
+<meta property="og:url" content="http://yoursite.com/2018/03/08/android/android安全机制/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:android 通过代码混淆，应用权限，应用签名，虚拟机隔离等多种手段保护应用的安全。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-07T14:31:51.855Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="android安全机制">
+<meta name="twitter:description" content="简介:android 通过代码混淆，应用权限，应用签名，虚拟机隔离等多种手段保护应用的安全。">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-android/android安全机制" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      android安全机制
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/08/android/android安全机制/" class="article-date">
+  <time datetime="2018-03-08T02:06:17.000Z" itemprop="datePublished">2018-03-08</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/android/">android</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>android 通过代码混淆，应用权限，应用签名，虚拟机隔离等多种手段保护应用的安全。<br><a id="more"></a> </p>
+<h4 id="第一道防线"><a href="#第一道防线" class="headerlink" title="第一道防线"></a>第一道防线</h4><p>代码安全机制——代码混淆 proguard<br>proguard(混淆器)它可以混淆关键代码、替换命名让破坏者阅读困难，同时也可以压缩代码、优化编译后的Java字节码。</p>
+<h4 id="第二道防线"><a href="#第二道防线" class="headerlink" title="第二道防线"></a>第二道防线</h4><p>应用接入权限控制——AndroidMainifest 文件权限声明、权限检查机制<br>只有当一个应用App具有相应的权限，才能在申请受限资源的时候，通过权限机制的检查并使用系统的Binder对象完成对系统服务的调用。<br>不足：1、被授予的权限无法停止。2、在应用声明App使用权限时，用户无法针对部分权限进行限制。3、权限的声明机制与用户的安全理念相关<br>系统按照以下顺序检查操作者的权限<br>首先判断permission名称，如果为空则直接返回PERMISSION_DENIED.<br>其次，判断Uid.如果为0则为Root权限，不做权限控制；如果为System Server的Uid则为系统服务，不做权限控制；如果Uid与参数中的请求Uid不同，则返回PERMISSION_DENIED.<br>最后，通过调用PackageManagerService.checkUidPermission()方法判断该Uid是否具有相应的权限，该方法会去XML的权限列表和系统级的platform.xml中进行查找。</p>
+<h4 id="第三道防线"><a href="#第三道防线" class="headerlink" title="第三道防线"></a>第三道防线</h4><p>应用签名机制——数字证书<br>Android中所有的App都会有一个数字证书，这就是App的签名，只有拥有相同数字签名的App,才会在升级时被认为是同一App.而且Android系统不会安装没有签名的App.</p>
+<h4 id="第四道防线"><a href="#第四道防线" class="headerlink" title="第四道防线"></a>第四道防线</h4><p>Linux内核层安全机制——Uid,访问权限控制<br>只有System.root用户才有权限访问到系统文件，而一般用户无法访问。</p>
+<h4 id="第五道防线"><a href="#第五道防线" class="headerlink" title="第五道防线"></a>第五道防线</h4><p>Android虚拟机沙箱机制——沙箱隔离<br>Android的app运行在虚拟机中，不同的应用之间不能互相访问，每个App都有对应的Uid.</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/03/08/android/android子模块有关说明/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          android子模块有关说明
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/08/android/android项目构建流程/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">android 项目构建流程&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

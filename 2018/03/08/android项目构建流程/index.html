@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>android 项目构建流程 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:Android 工程通过编译以及打包,打包成 .apk 文件（.dex files，resource.arsc,uncompiled resources，AndroidManifest.xml）然后 签名 最后通过 ADB 链接到设备或虚拟机。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android 项目构建流程">
+<meta property="og:url" content="http://yoursite.com/2018/03/08/android项目构建流程/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:Android 工程通过编译以及打包,打包成 .apk 文件（.dex files，resource.arsc,uncompiled resources，AndroidManifest.xml）然后 签名 最后通过 ADB 链接到设备或虚拟机。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/images/project_build.png">
+<meta property="og:image" content="http://yoursite.com/images/project_build2.png">
+<meta property="og:updated_time" content="2018-03-09T02:07:30.352Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="android 项目构建流程">
+<meta name="twitter:description" content="简介:Android 工程通过编译以及打包,打包成 .apk 文件（.dex files，resource.arsc,uncompiled resources，AndroidManifest.xml）然后 签名 最后通过 ADB 链接到设备或虚拟机。">
+<meta name="twitter:image" content="http://yoursite.com/images/project_build.png">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-android项目构建流程" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      android 项目构建流程
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/08/android项目构建流程/" class="article-date">
+  <time datetime="2018-03-08T01:52:14.000Z" itemprop="datePublished">2018-03-08</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/android/">android</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>Android 工程通过编译以及打包,打包成 .apk 文件（.dex files，resource.arsc,uncompiled resources，AndroidManifest.xml）然后 签名 最后通过 ADB 链接到设备或虚拟机。<br><a id="more"></a><br><img src="/images/project_build.png" alt=""><br><img src="/images/project_build2.png" alt=""></p>
+<h4 id="构建过程"><a href="#构建过程" class="headerlink" title="构建过程"></a>构建过程</h4><p>1、把源代码编译进DEX(Dalvik Executable)文件，包括Android设备上运行的字节码文件和其它编译资源<br>2、apk安装包包括DEX文件和其它资源文件，在安装包运行在Android设备之前必须被签名<br>3、apk安装包签名使用调试或者发布keystore，如果你只想进行测试和分析，需要使用debug kenstore,android studio自动为新项目配置debug kenstore<br>4、在生成最终apk之前，会使用zipalign工具使你的app在设备上运行时使用更少内存。<br>构建过程结束你会有debug ask和release apk,去部署，测试或发布给用户。</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/03/08/android安全机制/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          android安全机制
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/06/android事件分发机制/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">android事件分发机制&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

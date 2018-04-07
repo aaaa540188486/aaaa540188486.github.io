@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Gradle-构建javadoc文档 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:如果你是一个库开发者，那么必不可少的就是像对使用者提供sdk文档，这篇讲述使用gradle来构建javadoc文档">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gradle-构建javadoc文档">
+<meta property="og:url" content="http://yoursite.com/2018/03/19/gradle/Gradle-构建javadoc文档/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:如果你是一个库开发者，那么必不可少的就是像对使用者提供sdk文档，这篇讲述使用gradle来构建javadoc文档">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/images/gradle_javadoc1.png">
+<meta property="og:image" content="http://yoursite.com/images/gradle_javadoc2.png">
+<meta property="og:image" content="http://yoursite.com/images/gradle_javadoc3.png">
+<meta property="og:image" content="http://yoursite.com/images/gradle_javadoc4.png">
+<meta property="og:updated_time" content="2018-04-07T14:31:51.855Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Gradle-构建javadoc文档">
+<meta name="twitter:description" content="简介:如果你是一个库开发者，那么必不可少的就是像对使用者提供sdk文档，这篇讲述使用gradle来构建javadoc文档">
+<meta name="twitter:image" content="http://yoursite.com/images/gradle_javadoc1.png">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-gradle/Gradle-构建javadoc文档" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Gradle-构建javadoc文档
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/19/gradle/Gradle-构建javadoc文档/" class="article-date">
+  <time datetime="2018-03-19T08:06:13.000Z" itemprop="datePublished">2018-03-19</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/gradle/">gradle</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>如果你是一个库开发者，那么必不可少的就是像对使用者提供sdk文档，这篇讲述使用gradle来构建javadoc文档<br><a id="more"></a>  </p>
+<h4 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h4><p>首先我们有一个自己的库模块，这里我新建一个library名叫mylibrary，然后在模块里创造一个类用于展示</p>
+<figure class="half"><br>    <img src="/images/gradle_javadoc1.png"><br>    <img src="/images/gradle_javadoc2.png"><br></figure>
+
+<h4 id="新建一个task"><a href="#新建一个task" class="headerlink" title="新建一个task"></a>新建一个task</h4><p>我们在库模块下面新建一个gradle-javadoc.gradle文件用于存放javadoc相关task,并在模块的build.gradle中通过下面代码包含该文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">apply from: &apos;gradle-javadoc.gradle&apos;</div></pre></td></tr></table></figure></p>
+<p>我们在gradle-javadoc文件中构建一个task,代码如下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function">task <span class="title">javadoc</span><span class="params">(type: Javadoc)</span> </span>&#123;</div><div class="line">    android.libraryVariants.all &#123; variant -&gt;</div><div class="line">        <span class="comment">//javadoc生成时遇到错误继续执行</span></div><div class="line">        failOnError = <span class="keyword">false</span></div><div class="line">        <span class="comment">//文档产生路径</span></div><div class="line">        destinationDir = <span class="keyword">new</span> File(destinationDir, variant.baseName)</div><div class="line">        <span class="comment">//指定源码文件</span></div><div class="line">        source = files(variant.javaCompile.source)</div><div class="line">        <span class="comment">//用于解析源代码中的类型引用的类路径</span></div><div class="line">        classpath = files(variant.javaCompile.classpath.files) + files(android.bootClasspath)</div><div class="line">        <span class="comment">//生成javadoc设置选项</span></div><div class="line">        options.windowTitle(<span class="string">" SDK $VERSION_NAME "</span>)</div><div class="line">        <span class="comment">//不包含R文件和BuildConfig文件</span></div><div class="line">        exclude <span class="string">'**/R.java'</span>,<span class="string">'**/BuildConfig.java'</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在上面的代码里，我们构建里一个叫做javadoc的task，并且指定代码路径以及产生文件路径</p>
+<h4 id="执行task"><a href="#执行task" class="headerlink" title="执行task"></a>执行task</h4><p>任务构建完之后，当我们需要文档时，我们需要执行文件，在命令行输入下面命令，这里我是linux系统，window系统gradle命令不同<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./gradlew javadoc</div></pre></td></tr></table></figure></p>
+<h4 id="浏览文档"><a href="#浏览文档" class="headerlink" title="浏览文档"></a>浏览文档</h4><p>我们在app/build 路径下会发现生成一个docs文件，我们找到该文件下的index.html文件，用浏览器打开，便可以浏览文档了</p>
+<figure class="half"><br>    <img src="/images/gradle_javadoc3.png"><br>    <img src="/images/gradle_javadoc4.png"><br></figure>
+
+<h4 id="其它参数设置"><a href="#其它参数设置" class="headerlink" title="其它参数设置"></a>其它参数设置</h4><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>classpath</td>
+<td>用于解析源代码中的类型引用的类路径</td>
+</tr>
+<tr>
+<td>destinationDir</td>
+<td>生成文档的目录</td>
+</tr>
+<tr>
+<td>excludes</td>
+<td>排除文件</td>
+</tr>
+<tr>
+<td>executable</td>
+<td>用于生成Javadoc的Javadoc可执行文件。如果为null，则使用当前JVM的Javadoc可执行文件。</td>
+</tr>
+<tr>
+<td>failOnError</td>
+<td>指定在Javadoc生成期间遇到错误时此任务是否失败。</td>
+</tr>
+<tr>
+<td>includes</td>
+<td>包含模式的集合。</td>
+</tr>
+<tr>
+<td>maxMemory</td>
+<td>分配给此任务的内存量。</td>
+</tr>
+<tr>
+<td>options</td>
+<td>Javadoc生成选项。</td>
+</tr>
+<tr>
+<td>source</td>
+<td>在包含和排除模式应用之后，此任务的来源。忽略不存在的源文件。</td>
+</tr>
+<tr>
+<td>title</td>
+<td>生成的文档的标题。</td>
+</tr>
+<tr>
+<td>toolChain</td>
+<td>将用于生成Javadoc的工具链。</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/03/22/android/android-Monkey压力测试/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          android-Monkey压力测试
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/12/android/android-NDK开发之Cmake构建原生库/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">android NDK开发之Cmake构建原生库&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

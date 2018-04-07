@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>android NDK开发之Cmake构建原生库 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:android NDK开发有通过外部的构建工具将原生代码构建成库文件，也有用开发工具自身带的，android studio支持CMake和ndk-build来构建原生库，这里我们介绍通过CMake来构建原生代码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android NDK开发之Cmake构建原生库">
+<meta property="og:url" content="http://yoursite.com/2018/03/12/android/android-NDK开发之Cmake构建原生库/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:android NDK开发有通过外部的构建工具将原生代码构建成库文件，也有用开发工具自身带的，android studio支持CMake和ndk-build来构建原生库，这里我们介绍通过CMake来构建原生代码。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/images/ndk-install.png">
+<meta property="og:updated_time" content="2018-04-07T14:31:51.854Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="android NDK开发之Cmake构建原生库">
+<meta name="twitter:description" content="简介:android NDK开发有通过外部的构建工具将原生代码构建成库文件，也有用开发工具自身带的，android studio支持CMake和ndk-build来构建原生库，这里我们介绍通过CMake来构建原生代码。">
+<meta name="twitter:image" content="http://yoursite.com/images/ndk-install.png">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-android/android-NDK开发之Cmake构建原生库" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      android NDK开发之Cmake构建原生库
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/12/android/android-NDK开发之Cmake构建原生库/" class="article-date">
+  <time datetime="2018-03-12T08:07:02.000Z" itemprop="datePublished">2018-03-12</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/android/">android</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>android NDK开发有通过外部的构建工具将原生代码构建成库文件，也有用开发工具自身带的，android studio支持CMake和ndk-build来构建原生库，这里我们介绍通过CMake来构建原生代码。<br><a id="more"></a> </p>
+<h4 id="下载安装工具"><a href="#下载安装工具" class="headerlink" title="下载安装工具"></a>下载安装工具</h4><p>打开SDK Manager 安装android NDK,CMake,LLDB</p>
+<ul>
+<li>android NDK:原生开发工具包</li>
+<li>CMake :原生代码构建工具</li>
+<li>LLDB :调试原生代码程序工具</li>
+</ul>
+<p><img src="/images/ndk-install.png" alt=""></p>
+<h4 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h4><p>在向导中勾选include c++ support,并设置下面选项</p>
+<ol>
+<li>C++ Standard：使用下拉列表选择您希望使用哪种 C++ 标准。选择 Toolchain Default 会使用默认的 CMake 设置。</li>
+<li>Exceptions Support：如果您希望启用对 C++ 异常处理的支持，请选中此复选框。如果启用此复选框，Android Studio 会将 -fexceptions 标志添加到模块级 build.gradle 文件的 cppFlags 中，Gradle 会将其传递到 CMake。</li>
+<li>Runtime Type Information Support：如果您希望支持 RTTI，请选中此复选框。如果启用此复选框，Android Studio 会将 -frtti 标志添加到模块级 build.gradle 文件的 cppFlags 中，Gradle 会将其传递到 CMake。</li>
+</ol>
+<h4 id="构建运行项目"><a href="#构建运行项目" class="headerlink" title="构建运行项目"></a>构建运行项目</h4><ol>
+<li>Gradle 调用您的外部构建脚本 CMakeLists.txt。</li>
+<li>CMake 按照构建脚本中的命令将 C++ 源文件 native-lib.cpp 编译到共享的对象库中，并命名为libnative-lib.so，Gradle 随后会将其打包到 APK 中。</li>
+<li>运行时，应用的 MainActivity 会使用 System.loadLibrary() 加载原生库。现在，应用可以使用库的原生函数 stringFromJNI()。</li>
+<li>MainActivity.onCreate() 调用 stringFromJNI()，这将返回“Hello from C++”并使用这些文字更新 TextView。</li>
+</ol>
+<h4 id="CMakeLists-txt"><a href="#CMakeLists-txt" class="headerlink" title="CMakeLists.txt"></a>CMakeLists.txt</h4><p>CMakeLists.txt是构建脚本文件，这里我们看新创建的demo里的文件<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">cmake_minimum_required(VERSION <span class="number">3.4</span>.1)</div><div class="line">add_library( # Sets the name of the library.</div><div class="line">             <span class="keyword">native</span>-lib</div><div class="line"></div><div class="line">             # Sets the library as a shared library.</div><div class="line">             SHARED</div><div class="line"></div><div class="line">             # Provides a relative path to your source file(s).</div><div class="line">             src/main/cpp/<span class="keyword">native</span>-lib.cpp )</div><div class="line">find_library( # Sets the name of the path variable.</div><div class="line">              log-lib</div><div class="line"></div><div class="line">              # Specifies the name of the NDK library that</div><div class="line">              # you want CMake to locate.</div><div class="line">              log )</div><div class="line">target_link_libraries( # Specifies the target library.</div><div class="line">                       <span class="keyword">native</span>-lib</div><div class="line"></div><div class="line">                       # Links the target library to the log library</div><div class="line">                       # included in the NDK.</div><div class="line">                       $&#123;log-lib&#125; )</div></pre></td></tr></table></figure></p>
+<p>这里我们通过相关cmake命令可知，这里是指定了cmake的版本，指定了库文件以及查找并关联了一个log的库文件</p>
+<h4 id="配置CMakeLists-txt文件路径"><a href="#配置CMakeLists-txt文件路径" class="headerlink" title="配置CMakeLists.txt文件路径"></a>配置CMakeLists.txt文件路径</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">externalNativeBuild &#123;</div><div class="line"></div><div class="line">    <span class="comment">// Encapsulates your CMake build configurations.</span></div><div class="line">    cmake &#123;</div><div class="line"></div><div class="line">      <span class="comment">// Provides a relative path to your CMake build script.</span></div><div class="line">      path <span class="string">"CMakeLists.txt"</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h4 id="配置ABI"><a href="#配置ABI" class="headerlink" title="配置ABI"></a>配置ABI</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">ndk &#123;</div><div class="line">      <span class="comment">// Specifies the ABI configurations of your native</span></div><div class="line">      <span class="comment">// libraries Gradle should build and package with your APK.</span></div><div class="line">      abiFilters <span class="string">'x86'</span>, <span class="string">'x86_64'</span>, <span class="string">'armeabi'</span>, <span class="string">'armeabi-v7a'</span>,</div><div class="line">                   <span class="string">'arm64-v8a'</span></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h4 id="库命名"><a href="#库命名" class="headerlink" title="库命名"></a>库命名</h4><p>在cmake脚本文件里通过add_library命令中指定库文件名字，其产生文件格式为<br>lib库名称.so<br>代码中通过 System.loadLibrary(“库名称”);来进行库的加载</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/03/19/gradle/Gradle-构建javadoc文档/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          Gradle-构建javadoc文档
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/09/open/AndFix热修复框架集成与使用/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">AndFix热修复框架集成与使用&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

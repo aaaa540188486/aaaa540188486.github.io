@@ -19,8 +19,8 @@
   
     <link rel="icon" href="/favicon.png">
   
-  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
-  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
   <link rel="stylesheet" href="/css/style.css">
   
 
@@ -32,7 +32,7 @@
   <div id="header-outer" class="outer">
     <div id="header-inner" class="inner">
       <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
-      <a id="logo" class="logo" href="/"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
       <nav id="main-nav">
         
           <a class="main-nav-link" href="/">Home</a>
@@ -57,7 +57,7 @@
   </div>
 </header>
     <section id="main" class="outer">
-      <article id="post-Git" class="article article-type-post" itemscope itemprop="blogPost">
+      <article id="post-design/设计模式之Builder模式" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
     
@@ -65,54 +65,22 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/02/26/Git/">Git常用使用场景和命令</a>
+      <a class="article-title" href="/2018/04/07/design/设计模式之Builder模式/">设计模式之Builder模式</a>
     </h1>
   
 
       </header>
     
     <div class="article-meta">
-      <a href="/2018/02/26/Git/" class="article-date">
-  <time datetime="2018-02-25T22:17:52.000Z" itemprop="datePublished">2018-02-26</time>
+      <a href="/2018/04/07/design/设计模式之Builder模式/" class="article-date">
+  <time datetime="2018-04-07T14:54:32.000Z" itemprop="datePublished">2018-04-07</time>
 </a>
       
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/VCS/">VCS</a>
-  </div>
-
       
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Git 是一个版本控制工具，除了git外还有其他版本控制工具，例如svn,主要是用来解决不同系统不同开发者分工协作的问题，git是一个分布式版本控制系统，每次克隆都将仓库代码完整镜像下来，也是对代码仓库的一次备份，正因如此，git可以在本地进行工作任务处理。相比其它版本控制工具，git以每次提交的文件快照作为处理，而不是以每一次文件的差异性作为信息保存。<br>官网：<a href="https://git-scm.com/" target="_blank" rel="external">https://git-scm.com/</a>  </p>
-<h3 id="常用命令以及场景"><a href="#常用命令以及场景" class="headerlink" title="常用命令以及场景"></a>常用命令以及场景</h3><ol>
-<li><p>环境设置<br>通过下面命令设置git confit 命令设置提交的用户信息，通过 git config –list 命令可列出配置信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git config --global user.name &quot;John Doe&quot;</div><div class="line">git config --global user.email johndoe@example.com</div></pre></td></tr></table></figure>
-</li>
-<li><p>项目建立<br>有两种方式可以开始项目，第一种是本地新建项目推送到远程代码仓库，第二种是通过远程仓库克隆到本地进行工作<br>执行下面命令进行代码仓库初始化,并会生成.git隐藏文件,该文件包含了git相关信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git init （本地项目目录下初始化）</div><div class="line">git clone *** (远程仓库克隆项目到本地，***代表代码仓库地址)</div></pre></td></tr></table></figure>
-</li>
-<li><p>提交工作<br>修改完代码后，先将文件添加到暂存区，然后检查文件状态，最后整理好提交信息提交代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">git add . (添加所有文件到暂存区)</div><div class="line">git status -s(文件状态简览)</div><div class="line">git diff (查看所有文件修改)</div><div class="line">git reset HEAD *** (撤销已暂存文件修改，***代表文件路径)</div><div class="line">git checkout *** (撤销未暂存文件修改，***代表文件路径)</div><div class="line">git comit -m &quot;commit info&quot;(提交代码)</div><div class="line">git commit -amend -m &quot;commit info&quot;(修改上一次提交信息)</div></pre></td></tr></table></figure>
-</li>
-<li><p>分支管理<br>当项目有了不同特性需求后，需要多个版本时，这时用到了git分支相关功能</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">git ls-remote （查看项目远程仓库分支）</div><div class="line">git branch (查看本地分支)</div><div class="line">git branch *** (创建分支，***代表分支名)</div><div class="line">git branch -d *** (删除本地分支，***代表分支名)</div><div class="line">git branch -D *** (强制删除本地分支，***代表分支名)</div><div class="line">git push origin --delete branchname (删除远程分支)</div><div class="line">git push origin *** (推送分支到远程代码仓库，***代表分支名)</div><div class="line">git checkout -b *** origin/*** (拉取远程分支代码到本地分支，***代表分支名)</div></pre></td></tr></table></figure>
-</li>
-<li><p>推拉远程代码<br>当项目多人进行工作时，需要拉取最新代码，以及推送自己代码到远程代码仓库,remote代表远程仓库根目录，branch代表分支名</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git pull (remote)(branch) </div><div class="line">git push (remote)(branch)</div></pre></td></tr></table></figure>
-</li>
-<li><p>回滚代码<br>当项目代码出现问题时，需要返回以前版本的代码时，可通过下面命令进行代码回滚</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git reset --hard *** (*** 代表回滚地方的代码提交id)</div></pre></td></tr></table></figure>
-</li>
-<li><p>标签管理<br>当代码需要标记，或者版本需要标记时，可在提交处打上标签进行代码管理</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">git tag (列出标签)</div><div class="line">git tag *** (新建轻量标签，***代表标签名)</div><div class="line">git tag -a *** -m &quot;tag info&quot; (新建附注标签)</div><div class="line">git tag -a tagname commitId (补签，tagname表示标签名，commitId表示补签提交的id)</div><div class="line">git tag show ***（查看标签信息，***代表标签名）</div><div class="line">git push origin *** (推送标签到远程仓库共，***代表标签名享)</div><div class="line">git push origin -tags (推送所有标签)</div><div class="line">git checkout -b branchname tagname (检出标签到新建分支，branchname表示分支名，tagname表示标签名)</div></pre></td></tr></table></figure>
-</li>
-<li><p>分支合并<br>开发过程中，会因为项目特性，需求，以及bug等原因需要开多个分支进行编码处理，当处理完之后则需要合并到稳定分支或线上分支上，这里有两种方式，一是合并分支，二是变基分支。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git merge branchname (合并分支会将两个分支的末端提交和共同的祖先提交进行三方合并形成新的分支)</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>变基分支则需要多个步骤，假设主分支为master, 被合并的分支为 branch1,先切换到branch1分支进行变基，然后再切换到主分支进行快进合并,变基分支和合并分支不同的特点在于它是相当于在主分支上重新建立分支上的修改提交，在log上显的更加清晰一些，要注意的是，避免在协作过程中将已经推送的提交进行变基操作。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">git checkout branch1</div><div class="line">git rebase master</div><div class="line">git checkout master</div><div class="line">git merge branch1</div></pre></td></tr></table></figure></p>
-
+        
       
     </div>
     
@@ -125,11 +93,9 @@
 
 
 
-
-
-
+ 
     
-      <article id="post-网络通信框架-Retrofit" class="article article-type-post" itemscope itemprop="blogPost">
+      <article id="post-android/android性能优化" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
     
@@ -137,15 +103,15 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/11/02/网络通信框架-Retrofit/">网络通信框架-Retrofit</a>
+      <a class="article-title" href="/2018/03/30/android/android性能优化/">android性能优化</a>
     </h1>
   
 
       </header>
     
     <div class="article-meta">
-      <a href="/2017/11/02/网络通信框架-Retrofit/" class="article-date">
-  <time datetime="2017-11-02T12:09:56.000Z" itemprop="datePublished">2017-11-02</time>
+      <a href="/2018/03/30/android/android性能优化/" class="article-date">
+  <time datetime="2018-03-30T02:43:27.000Z" itemprop="datePublished">2018-03-30</time>
 </a>
       
   <div class="article-category">
@@ -156,82 +122,12 @@
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="简介："><a href="#简介：" class="headerlink" title="简介："></a>简介：</h3><p>Retrofit 是Square公司推出的一个类型安全的Http的适应于Android,java客户端的框架</p>
-<h3 id="下载："><a href="#下载：" class="headerlink" title="下载："></a>下载：</h3><p>Gradle: compile ‘com.squareup.retrofit2:retrofit:2.1.0’<br>要求 java7, Android2.3以上<br>官网：<a href="http://square.github.io/retrofit/" target="_blank" rel="external">http://square.github.io/retrofit/</a>  </p>
-<h3 id="使用："><a href="#使用：" class="headerlink" title="使用："></a>使用：</h3><ol>
-<li><p>申明一个API接口  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public interface GitHubService &#123;</div><div class="line">    @GET(&quot;users/&#123;user&#125;/repos&quot;)</div><div class="line">    Call&lt;List&lt;Repo&gt;&gt;listRepos(@Path(&quot;user&quot;) String user);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p>使用Retrofit类实现这个接口  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Retrofit retrofit = new Retrofit.Builder()</div><div class="line">.baseUrl(&quot;https://api.github.com/&quot;)</div><div class="line">.build();</div><div class="line">GitHubService service = retrofit.create(GitHubService.class);</div></pre></td></tr></table></figure>
-</li>
-<li><p>同步或异步向服务器发送http请求  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Call&lt;List&lt;Repo&gt;&gt; repos = service.listRepos(&quot;octocat&quot;);</div><div class="line">repos.enqueue(new Callback&lt;List&lt;Repo&gt;&gt;)&#123;</div><div class="line">     @Override</div><div class="line">     public void onResponse(Response&lt;List&lt;Repo&gt;&gt; response,Retrofit retrofit)&#123;</div><div class="line">     &#125;</div><div class="line">     @Override</div><div class="line">     public void onFailure(Throwable t)&#123;</div><div class="line">     &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h3 id="使用注解描述请求"><a href="#使用注解描述请求" class="headerlink" title="使用注解描述请求"></a>使用注解描述请求</h3><ul>
-<li>支持URL参数和请求参数</li>
-<li>请求实体对象转换</li>
-<li>多种请求实体和文件上传</li>
-</ul>
-<h3 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h3><p>其中http包为各种注解  </p>
-<figure class="half"><br>    <img src="/images/retrofit_http.png"><br>    <img src="/images/retrofit_class.png"><br></figure>
-
-<ul>
-<li><p>Body<br>用来指定POST或PUT请求里以实体形式发送的请求方法的参数，对象将会被序列化并放在请求body中  </p>
-</li>
-<li><p>DELETE<br>用来指定一个删除请求  </p>
-</li>
-<li><p>Field<br>用来指定form-encoded请求的指定键值参数，支持多个多个字符串指定</p>
-</li>
-<li><p>FieldMap<br>用来指定form-encoded请求的未指定键值对参数</p>
-</li>
-<li><p>FormUrlEncoded<br>用来指定一个Url被加密，使请求带有application/x-www-form-urlencoded MIME 类型<br>键值对将会由之前的UTF-8编码RFC-3986</p>
-</li>
-<li><p>GET<br>用来指定一个GET请求</p>
-</li>
-<li><p>HEAD<br>用来指定一个HEAD请求</p>
-</li>
-<li><p>Header<br>用来指定请求头部参数，如果有重复，不会被重写，会被同时包含在头文件里</p>
-</li>
-<li><p>Headers<br>用来指定头部键值对信息</p>
-</li>
-<li><p>HTTP<br>用来指定HTTP形式请求</p>
-</li>
-<li><p>Multipart<br>表示请求实体为多个，每部分使用@Part注解在参数中声明</p>
-</li>
-<li><p>OPTIONS<br>用来指定一个OPTIOINS请求</p>
-</li>
-<li><p>Part<br>用来指定含有多个部分请求的一个部分</p>
-</li>
-<li><p>PartMap<br>表示键值对部分</p>
-</li>
-<li><p>PATCH<br>用来指定一个PATCH请求</p>
-</li>
-<li><p>Path<br>用来在参数中指定url被替换的部分</p>
-</li>
-<li><p>POST<br>用来指定一个POST请求</p>
-</li>
-<li><p>PUT<br>用来指定一个PUT请求</p>
-</li>
-<li><p>Query<br>用来指定Url路径的查询键值对参数</p>
-</li>
-<li><p>QueryMap<br>用来指定Url路径的查询键值对</p>
-</li>
-<li><p>Streaming<br>用来指定Response body为字节数组形式返回</p>
-</li>
-<li><p>URL<br>用来指定完整路径</p>
-</li>
-</ul>
-<h3 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h3><p>首先先构建一个Retrofit对象，从构建方式可以看出，使用的是设计模式中的Builder模式，Builder模式用于构建复杂的对象，并将构建过程和它的部件解耦，使用户在不知道内部构建细节的情况下精细的控制对象的构建流程。</p>
-<p>最后在build方法中设置相关参数，如果未设置callFactory会构造默认的okHttpClient对象，其余的则默认构造Platform类的默认方法获取相关对象，然后将相关参数通过Retrofit类的构造方法构造出Retrofit对象</p>
-<p><img src="/images/retrofit_build.png" alt=""></p>
-<p>通过Retrofit类的create方法，返回一个动态代理的对象，这里涉及到涉及模式中的代理模式，也称为委托模式，相关代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">public &lt;T&gt; T create(final Class&lt;T&gt; service) &#123;</div><div class="line">  Utils.validateServiceInterface(service);</div><div class="line">  if (validateEagerly) &#123;</div><div class="line">    eagerlyValidateMethods(service);</div><div class="line">  &#125;</div><div class="line">  return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class&lt;?&gt;[] &#123; service &#125;,</div><div class="line">      new InvocationHandler() &#123;</div><div class="line">        private final Platform platform = Platform.get();</div><div class="line"></div><div class="line">        @Override public Object invoke(Object proxy, Method method, Object... args)</div><div class="line">            throws Throwable &#123;</div><div class="line">          // If the method is a method from Object then defer to normal invocation.</div><div class="line">          if (method.getDeclaringClass() == Object.class) &#123;</div><div class="line">            return method.invoke(this, args);</div><div class="line">          &#125;</div><div class="line">          if (platform.isDefaultMethod(method)) &#123;</div><div class="line">            return platform.invokeDefaultMethod(method, service, proxy, args);</div><div class="line">          &#125;</div><div class="line">          ServiceMethod serviceMethod = loadServiceMethod(method);</div><div class="line">          OkHttpCall okHttpCall = new OkHttpCall&lt;&gt;(serviceMethod, args);</div><div class="line">          return serviceMethod.callAdapter.adapt(okHttpCall);</div><div class="line">        &#125;</div><div class="line">      &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>首先调用工具类方法validateServiceInterface()验证接口,这里将会验证传进来的类是否是接口类型，如果不是则报出“API申明必须是接口”的无效参数异常，如果是接口，则继续检查该类是否实现了其它接口，如果是，则报出“API 接口不能是其它接口延伸的”的无效参数异常  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">static &lt;T&gt; void validateServiceInterface(Class&lt;T&gt; service) &#123;  </div><div class="line">  if (!service.isInterface()) &#123;  </div><div class="line">    throw new IllegalArgumentException(&quot;API declarations must be interfaces.&quot;);  </div><div class="line">  &#125;  </div><div class="line">  // Prevent API interfaces from extending other interfaces. This not only avoids a bug in  </div><div class="line">  // Android (http://b.android.com/58753) but it forces composition of API declarations which is  </div><div class="line">  // the recommended pattern.  </div><div class="line">  if (service.getInterfaces().length &gt; 0) &#123;  </div><div class="line">    throw new IllegalArgumentException(&quot;API interfaces must not extend other interfaces.&quot;);  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>然后通过eagerlyValidateMethods()方法的loadServiceMethod()方法生成serviceMethod对象并一起存入缓存map中，通过platform这个类进行平台判断，对java8 特性 default method 方法做了兼容处理，这里做了个同步锁，防止多线程下重复put ServiceMethod对象。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">private void eagerlyValidateMethods(Class&lt;?&gt; service) &#123;</div><div class="line">  Platform platform = Platform.get();</div><div class="line">  for (Method method : service.getDeclaredMethods()) &#123;</div><div class="line">    if (!platform.isDefaultMethod(method)) &#123;</div><div class="line">      loadServiceMethod(method);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">ServiceMethod loadServiceMethod(Method method) &#123;</div><div class="line">  ServiceMethod result;</div><div class="line">  synchronized (serviceMethodCache) &#123;</div><div class="line">    result = serviceMethodCache.get(method);</div><div class="line">    if (result == null) &#123;</div><div class="line">      result = new ServiceMethod.Builder(this, method).build();</div><div class="line">      serviceMethodCache.put(method, result);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  return result;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>当执行阶段时，okHttpCall 会调用enqueue()方法，内部调用createRawCall() 方法生成okhttp3.Call对象，通过ServiceMethod实例的toRequest()方法将相关信息由RequestBuilder类构建成Request类请求并通过okHttpCall真正调用okhttp3发送请求。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">private okhttp3.Call createRawCall() throws IOException &#123;</div><div class="line">    Request request = serviceMethod.toRequest(args);</div><div class="line">    okhttp3.Call call = serviceMethod.callFactory.newCall(request);</div><div class="line">    if (call == null) &#123;</div><div class="line">      throw new NullPointerException(&quot;Call.Factory returned null.&quot;);</div><div class="line">    &#125;</div><div class="line">    return call;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
-
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>这里简单介绍下android性能优化的一些方法<br>
+        
+          <p class="article-more-link">
+            <a href="/2018/03/30/android/android性能优化/#more">阅读全文</a>
+          </p>
+        
       
     </div>
     
@@ -244,16 +140,394 @@
 
 
 
+ 
+    
+      <article id="post-mapbox/Mapbox源码分析之数据库初始化" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/29/mapbox/Mapbox源码分析之数据库初始化/">Mapbox源码分析之数据库初始化</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/29/mapbox/Mapbox源码分析之数据库初始化/" class="article-date">
+  <time datetime="2018-03-29T09:20:58.000Z" itemprop="datePublished">2018-03-29</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mapbox/">mapbox</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>通过源码，我们来一步步分析Mapbox地图引擎初始化本地数据库的流程，这里是基于5.3.0的版本．<br>
+        
+          <p class="article-more-link">
+            <a href="/2018/03/29/mapbox/Mapbox源码分析之数据库初始化/#more">阅读全文</a>
+          </p>
+        
+      
+    </div>
+    
+    
+  </div>
+  
+</article>
 
 
 
+
+
+ 
+    
+      <article id="post-mapbox/Mapbox源码分析之发送请求" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/29/mapbox/Mapbox源码分析之发送请求/">Mapbox源码分析之发送请求</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/29/mapbox/Mapbox源码分析之发送请求/" class="article-date">
+  <time datetime="2018-03-29T02:58:04.000Z" itemprop="datePublished">2018-03-29</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mapbox/">mapbox</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>通过源码，我们来一步步分析Mapbox地图引擎如何发送网络请求的，这里是基于5.3.0的版本．<br>
+        
+          <p class="article-more-link">
+            <a href="/2018/03/29/mapbox/Mapbox源码分析之发送请求/#more">阅读全文</a>
+          </p>
+        
+      
+    </div>
+    
+    
+  </div>
+  
+</article>
+
+
+
+
+
+ 
+    
+      <article id="post-mapbox/Mapbox源码分析之url解析" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/27/mapbox/Mapbox源码分析之url解析/">Mapbox源码分析之url解析</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/27/mapbox/Mapbox源码分析之url解析/" class="article-date">
+  <time datetime="2018-03-27T02:20:52.000Z" itemprop="datePublished">2018-03-27</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mapbox/">mapbox</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>通过源码，我们来一步步分析Mapbox地图引擎如何进行指定字符串变量解析成url地址加载的，这里是基于5.3.0的版本．<br>
+        
+          <p class="article-more-link">
+            <a href="/2018/03/27/mapbox/Mapbox源码分析之url解析/#more">阅读全文</a>
+          </p>
+        
+      
+    </div>
+    
+    
+  </div>
+  
+</article>
+
+
+
+
+
+ 
+    
+      <article id="post-mapbox/Mapbox源码分析之库加载" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/26/mapbox/Mapbox源码分析之库加载/">Mapbox源码分析之库加载</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/26/mapbox/Mapbox源码分析之库加载/" class="article-date">
+  <time datetime="2018-03-26T08:44:15.000Z" itemprop="datePublished">2018-03-26</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mapbox/">mapbox</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>通过源码，我们来一步步分析Mapbox地图引擎原生库加载的流程，这里是基于5.3.0的版本．<br>
+        
+          <p class="article-more-link">
+            <a href="/2018/03/26/mapbox/Mapbox源码分析之库加载/#more">阅读全文</a>
+          </p>
+        
+      
+    </div>
+    
+    
+  </div>
+  
+</article>
+
+
+
+
+
+ 
+    
+      <article id="post-mapbox/Mapbox源码分析之样式加载" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/26/mapbox/Mapbox源码分析之样式加载/">Mapbox源码分析之样式加载</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/26/mapbox/Mapbox源码分析之样式加载/" class="article-date">
+  <time datetime="2018-03-26T01:59:59.000Z" itemprop="datePublished">2018-03-26</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mapbox/">mapbox</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>通过源码，我们来一步步分析Mapbox地图引擎如何进行不同样式的数据加载的，这里是基于5.3.0的版本．<br>
+        
+          <p class="article-more-link">
+            <a href="/2018/03/26/mapbox/Mapbox源码分析之样式加载/#more">阅读全文</a>
+          </p>
+        
+      
+    </div>
+    
+    
+  </div>
+  
+</article>
+
+
+
+
+
+ 
+    
+      <article id="post-mapbox/Mapbox源码分析之地图渲染" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/23/mapbox/Mapbox源码分析之地图渲染/">Mapbox源码分析之地图渲染</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/23/mapbox/Mapbox源码分析之地图渲染/" class="article-date">
+  <time datetime="2018-03-23T06:19:46.000Z" itemprop="datePublished">2018-03-23</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mapbox/">mapbox</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>通过源码，我们来一步步分析Mapbox地图引擎如何进行不同数据源的地图渲染的，这里是基于5.3.0的版本．<br>
+        
+          <p class="article-more-link">
+            <a href="/2018/03/23/mapbox/Mapbox源码分析之地图渲染/#more">阅读全文</a>
+          </p>
+        
+      
+    </div>
+    
+    
+  </div>
+  
+</article>
+
+
+
+
+
+ 
+    
+      <article id="post-android/android-Monkey压力测试" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/22/android/android-Monkey压力测试/">android-Monkey压力测试</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/22/android/android-Monkey压力测试/" class="article-date">
+  <time datetime="2018-03-22T01:36:35.000Z" itemprop="datePublished">2018-03-22</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/android/">android</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>Monkey是一个运行在你的模拟器或设备上，并生成伪随机的用户事件流，如点击，触摸或手势，以及一些系统级事件的程序。你可以使用Monkey以随机但可重复的方式对您正在开发的应用程序进行压力测试。<br>
+        
+          <p class="article-more-link">
+            <a href="/2018/03/22/android/android-Monkey压力测试/#more">阅读全文</a>
+          </p>
+        
+      
+    </div>
+    
+    
+  </div>
+  
+</article>
+
+
+
+
+
+ 
+    
+      <article id="post-gradle/Gradle-构建javadoc文档" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/19/gradle/Gradle-构建javadoc文档/">Gradle-构建javadoc文档</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/19/gradle/Gradle-构建javadoc文档/" class="article-date">
+  <time datetime="2018-03-19T08:06:13.000Z" itemprop="datePublished">2018-03-19</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/gradle/">gradle</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>如果你是一个库开发者，那么必不可少的就是像对使用者提供sdk文档，这篇讲述使用gradle来构建javadoc文档<br>
+        
+          <p class="article-more-link">
+            <a href="/2018/03/19/gradle/Gradle-构建javadoc文档/#more">阅读全文</a>
+          </p>
+        
+      
+    </div>
+    
+    
+  </div>
+  
+</article>
+
+
+
+
+
+ 
+    
+      <nav id="page-nav">
+        <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
+      </nav>
     </section>
     <footer id="footer">
   
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2018 Koala&nbsp;
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>

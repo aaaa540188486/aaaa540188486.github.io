@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>android子模块有关说明 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:当你建立一个子模块时，需要注意下面几点">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android子模块有关说明">
+<meta property="og:url" content="http://yoursite.com/2018/03/08/android/android子模块有关说明/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:当你建立一个子模块时，需要注意下面几点">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-07T14:31:51.854Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="android子模块有关说明">
+<meta name="twitter:description" content="简介:当你建立一个子模块时，需要注意下面几点">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-android/android子模块有关说明" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      android子模块有关说明
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/08/android/android子模块有关说明/" class="article-date">
+  <time datetime="2018-03-08T02:19:19.000Z" itemprop="datePublished">2018-03-08</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/android/">android</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>当你建立一个子模块时，需要注意下面几点<br><a id="more"></a> </p>
+<ol>
+<li><p>资源冲突<br>当lib和项目合并进行依赖时，一个资源Id可能会被定义两个模块，一般项目的资源或者lib库优先级高的资源会被采用。（例如，整合第三方SDK的时候，发生的support-v4包冲突）</p>
+</li>
+<li><p>使用前缀避免资源冲突<br>为了避免资源冲突,共同资源id,考虑使用一个前缀或其他一致的命名方案独特的模块(或者是独特的在所有项目模块)。</p>
+</li>
+<li><p>你不能导出一个library module 到jar 文件<br>以后可能在未来版本的SDK工具上添加</p>
+</li>
+<li><p>一个library module可能包括一个jar library<br>您可以开发一个lib module本身包括JAR库;然而您需要手动编辑独立的应用程序模块的构建路径和添加JAR文件的路径</p>
+</li>
+<li><p>lib module可以依靠外部JAR库</p>
+</li>
+<li><p>lib module不能包含 raw assets</p>
+</li>
+<li><p>平台版本必须低于或等于Android模块</p>
+</li>
+<li><p>lib module 名字没有限制</p>
+</li>
+<li><p>每一个library module 会创建它自己的R 文件</p>
+</li>
+<li><p>lib module 存储位置<br>没有特别要求需要你去指明lib, module的存储位置，项目可以通过相关链接去引用这个模块</p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/03/09/open/Tinker热修复框架集成与使用/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          Tinker热修复框架集成与使用
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/08/android/android安全机制/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">android安全机制&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

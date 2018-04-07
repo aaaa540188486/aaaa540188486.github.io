@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Mapbox源码分析之数据库初始化 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:通过源码，我们来一步步分析Mapbox地图引擎初始化本地数据库的流程，这里是基于5.3.0的版本．">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mapbox源码分析之数据库初始化">
+<meta property="og:url" content="http://yoursite.com/2018/03/29/mapbox/Mapbox源码分析之数据库初始化/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:通过源码，我们来一步步分析Mapbox地图引擎初始化本地数据库的流程，这里是基于5.3.0的版本．">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-07T14:31:51.857Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mapbox源码分析之数据库初始化">
+<meta name="twitter:description" content="简介:通过源码，我们来一步步分析Mapbox地图引擎初始化本地数据库的流程，这里是基于5.3.0的版本．">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-mapbox/Mapbox源码分析之数据库初始化" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Mapbox源码分析之数据库初始化
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/29/mapbox/Mapbox源码分析之数据库初始化/" class="article-date">
+  <time datetime="2018-03-29T09:20:58.000Z" itemprop="datePublished">2018-03-29</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mapbox/">mapbox</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>通过源码，我们来一步步分析Mapbox地图引擎初始化本地数据库的流程，这里是基于5.3.0的版本．<br><a id="more"></a>  </p>
+<p>####　注意<br>当我写这篇博客的时候，在官方changlog看到后续版本中对FileSource激活部分有做改动，这里暂时以现有版本为主，需要详细了解的同学可以下载新版本的源码了解</p>
+<p>Mapbox提供了地图的离线下载存储功能，那么它是什么时候创建本地数据库的呢，我们看到NativeMapView的构造方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">NativeMapView</span><span class="params">(<span class="keyword">final</span> MapView mapView, MapRenderer mapRenderer)</span> </span>&#123;</div><div class="line">    <span class="keyword">this</span>.mapRenderer = mapRenderer;</div><div class="line">    <span class="keyword">this</span>.mapView = mapView;</div><div class="line"></div><div class="line">    Context context = mapView.getContext();</div><div class="line">    fileSource = FileSource.getInstance(context);</div><div class="line">    pixelRatio = context.getResources().getDisplayMetrics().density;</div><div class="line"></div><div class="line">    nativeInitialize(<span class="keyword">this</span>, fileSource, mapRenderer, pixelRatio);</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到它拿到了FileSource对象的实例,在这个类的注解中，我们知道它是负责激活本地数据源的，那么我们看看它的getInstance()方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> FileSource <span class="title">getInstance</span><span class="params">(Context context)</span> </span>&#123;</div><div class="line">   <span class="keyword">if</span> (INSTANCE == <span class="keyword">null</span>) &#123;</div><div class="line">     String cachePath = getCachePath(context);</div><div class="line">     INSTANCE = <span class="keyword">new</span> FileSource(cachePath, context.getResources().getAssets());</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="keyword">return</span> INSTANCE;</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们可以看出这是一个单例模式，我们看到它传入了一个缓存路径，那么这个路径会不会就是数据库存放的路径呢，我们继续往下看<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="title">FileSource</span><span class="params">(String cachePath, AssetManager assetManager)</span> </span>&#123;</div><div class="line">    initialize(Mapbox.getAccessToken(), cachePath, assetManager);</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到它调用了底层的初始化方法，那么我们看看和这个对应的底层文件file_source.cpp<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">FileSource::FileSource(jni::JNIEnv&amp; _env,</div><div class="line">                       jni::String accessToken,</div><div class="line">                       jni::String _cachePath,</div><div class="line">                       jni::Object&lt;AssetManager&gt; assetManager) &#123;</div><div class="line">    <span class="comment">// Create a core default file source</span></div><div class="line">    fileSource = <span class="built_in">std</span>::make_unique&lt;mbgl::DefaultFileSource&gt;(</div><div class="line">        jni::Make&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;(_env, _cachePath) + <span class="string">"/mbgl-offline.db"</span>,</div><div class="line">        <span class="built_in">std</span>::make_unique&lt;AssetManagerFileSource&gt;(_env, assetManager));</div><div class="line"></div><div class="line">    <span class="comment">// Set access token</span></div><div class="line">    fileSource-&gt;setAccessToken(jni::Make&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;(_env, accessToken));</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到它在传入的路径后面加了”/mbgl-offline.db”，这个路径果然是数据库路径，我们看到在这个构造方法中实例化了一个DefaultFileSource对象，那么我们看看DefaultFileSource对象的构造方法<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">DefaultFileSource::DefaultFileSource(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; cachePath,</div><div class="line">                                     <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; assetRoot,</div><div class="line">                                     <span class="keyword">uint64_t</span> maximumCacheSize)</div><div class="line">    : DefaultFileSource(cachePath, <span class="built_in">std</span>::make_unique&lt;AssetFileSource&gt;(assetRoot), maximumCacheSize) &#123;</div><div class="line">&#125;</div><div class="line"></div><div class="line">DefaultFileSource::DefaultFileSource(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; cachePath,</div><div class="line">                                     <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;FileSource&gt;&amp;&amp; assetFileSource_,</div><div class="line">                                     <span class="keyword">uint64_t</span> maximumCacheSize)</div><div class="line">        : assetFileSource(<span class="built_in">std</span>::move(assetFileSource_))</div><div class="line">        , impl(<span class="built_in">std</span>::make_unique&lt;util::Thread&lt;Impl&gt;&gt;(<span class="string">"DefaultFileSource"</span>, assetFileSource, cachePath, maximumCacheSize)) &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们发现他又初始化了它的Impl实现类，那么我继续看它的实现类<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Impl(ActorRef&lt;Impl&gt; self, <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;FileSource&gt; assetFileSource_, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; cachePath, <span class="keyword">uint64_t</span> maximumCacheSize)</div><div class="line">            : assetFileSource(assetFileSource_)</div><div class="line">            , localFileSource(<span class="built_in">std</span>::make_unique&lt;LocalFileSource&gt;()) &#123;</div><div class="line">        <span class="comment">// Initialize the Database asynchronously so as to not block Actor creation.</span></div><div class="line">        self.invoke(&amp;Impl::initializeOfflineDatabase, cachePath, maximumCacheSize);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">initializeOfflineDatabase</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span> cachePath, <span class="keyword">uint64_t</span> maximumCacheSize)</span> </span>&#123;</div><div class="line">        offlineDatabase = <span class="built_in">std</span>::make_unique&lt;OfflineDatabase&gt;(cachePath, maximumCacheSize);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到在它的构造方法中，又执行了initializeOfflineDatabase()方法，从这个方法名可以看出是初始化数据库，我们看到这个方法里面有实例化一个OfflineDatabase对象，我们看看这个对象<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">OfflineDatabase::OfflineDatabase(<span class="built_in">std</span>::<span class="built_in">string</span> path_, <span class="keyword">uint64_t</span> maximumCacheSize_)</div><div class="line">    : path(<span class="built_in">std</span>::move(path_)),</div><div class="line">      maximumCacheSize(maximumCacheSize_) &#123;</div><div class="line">    ensureSchema();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里看出并未做什么，初始化值之后，便调用了ensureSchema()方法，我们看看这个方法<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> OfflineDatabase::ensureSchema() &#123;</div><div class="line">    <span class="keyword">if</span> (path != <span class="string">":memory:"</span>) &#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            connect(mapbox::sqlite::ReadWrite);</div><div class="line"></div><div class="line">            <span class="keyword">switch</span> (userVersion()) &#123;</div><div class="line">            <span class="keyword">case</span> <span class="number">0</span>: <span class="keyword">break</span>; <span class="comment">// cache-only database; ok to delete</span></div><div class="line">            <span class="keyword">case</span> <span class="number">1</span>: <span class="keyword">break</span>; <span class="comment">// cache-only database; ok to delete</span></div><div class="line">            <span class="keyword">case</span> <span class="number">2</span>: migrateToVersion3(); <span class="comment">// fall through</span></div><div class="line">            <span class="keyword">case</span> <span class="number">3</span>: <span class="comment">// no-op and fall through</span></div><div class="line">            <span class="keyword">case</span> <span class="number">4</span>: migrateToVersion5(); <span class="comment">// fall through</span></div><div class="line">            <span class="keyword">case</span> <span class="number">5</span>: migrateToVersion6(); <span class="comment">// fall through</span></div><div class="line">            <span class="keyword">case</span> <span class="number">6</span>: <span class="keyword">return</span>;</div><div class="line">            <span class="keyword">default</span>: <span class="keyword">break</span>; <span class="comment">// downgrade, delete the database</span></div><div class="line">            &#125;</div><div class="line"></div><div class="line">            removeExisting();</div><div class="line">            connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);</div><div class="line">        &#125; <span class="keyword">catch</span> (mapbox::sqlite::Exception&amp; ex) &#123;</div><div class="line">            <span class="keyword">if</span> (ex.code != mapbox::sqlite::Exception::Code::CANTOPEN &amp;&amp; ex.code != mapbox::sqlite::Exception::Code::NOTADB) &#123;</div><div class="line">                Log::Error(Event::Database, <span class="string">"Unexpected error connecting to database: %s"</span>, ex.what());</div><div class="line">                <span class="keyword">throw</span>;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                <span class="keyword">if</span> (ex.code == mapbox::sqlite::Exception::Code::NOTADB) &#123;</div><div class="line">                    removeExisting();</div><div class="line">                &#125;</div><div class="line">                connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);</div><div class="line">            &#125; <span class="keyword">catch</span> (...) &#123;</div><div class="line">                Log::Error(Event::Database, <span class="string">"Unexpected error creating database: %s"</span>, util::toString(<span class="built_in">std</span>::current_exception()).c_str());</div><div class="line">                <span class="keyword">throw</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        <span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"offline_schema.cpp.include"</span></span></div><div class="line"></div><div class="line">        connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);</div><div class="line"></div><div class="line">        <span class="comment">// If you change the schema you must write a migration from the previous version.</span></div><div class="line">        db-&gt;exec(<span class="string">"PRAGMA auto_vacuum = INCREMENTAL"</span>);</div><div class="line">        db-&gt;exec(<span class="string">"PRAGMA journal_mode = DELETE"</span>);</div><div class="line">        db-&gt;exec(<span class="string">"PRAGMA synchronous = FULL"</span>);</div><div class="line">        db-&gt;exec(schema);</div><div class="line">        db-&gt;exec(<span class="string">"PRAGMA user_version = 6"</span>);</div><div class="line">    &#125; <span class="keyword">catch</span> (...) &#123;</div><div class="line">        Log::Error(Event::Database, <span class="string">"Unexpected error creating database schema: %s"</span>, util::toString(<span class="built_in">std</span>::current_exception()).c_str());</div><div class="line">        <span class="keyword">throw</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>到这里基本就可以看出来了首先是通过connect()方法连接数据库，我们先看看connect()方法<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> OfflineDatabase::connect(<span class="keyword">int</span> flags) &#123;</div><div class="line">    db = <span class="built_in">std</span>::make_unique&lt;mapbox::sqlite::Database&gt;(path.c_str(), flags);</div><div class="line">    db-&gt;setBusyTimeout(Milliseconds::max());</div><div class="line">    db-&gt;exec(<span class="string">"PRAGMA foreign_keys = ON"</span>);</div><div class="line">&#125;</div><div class="line">Database::Database(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;filename, <span class="keyword">int</span> flags)</div><div class="line">    : impl(<span class="built_in">std</span>::make_unique&lt;DatabaseImpl&gt;(filename.c_str(), flags))</div><div class="line">&#123;</div><div class="line">&#125;</div><div class="line">DatabaseImpl(<span class="keyword">const</span> <span class="keyword">char</span>* filename, <span class="keyword">int</span> flags)</div><div class="line">&#123;</div><div class="line">    <span class="keyword">const</span> <span class="keyword">int</span> error = sqlite3_open_v2(filename, &amp;db, flags, <span class="literal">nullptr</span>);</div><div class="line">    <span class="keyword">if</span> (error != SQLITE_OK) &#123;</div><div class="line">            <span class="keyword">const</span> <span class="keyword">auto</span> message = sqlite3_errmsg(db);</div><div class="line">            db = <span class="literal">nullptr</span>;</div><div class="line">            <span class="keyword">throw</span> Exception &#123; error, message &#125;;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我就把相关代码放一起了，我们看到connect()方法实例化了一个Database对象，并通过DatabaseImpl类调用sqlite3_open_v2()打开了一个数据库，那么和离线瓦片数据相关的表是怎么创建的呢，这里我们回到上面的ensureSchema()代码处，看到有这么一行<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"offline_schema.cpp.include"</span></span></div></pre></td></tr></table></figure></p>
+<p> 我们找到这个文件看看，我们找到该文件在 platform/default/mbgl/storage目录下<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line"> /* THIS IS A GENERATED FILE; EDIT offline_schema.sql INSTEAD */</div><div class="line">static const char * schema = </div><div class="line">&quot;CREATE TABLE resources (\n&quot;</div><div class="line">&quot;  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n&quot;</div><div class="line">&quot;  url TEXT NOT NULL,\n&quot;</div><div class="line">&quot;  kind INTEGER NOT NULL,\n&quot;</div><div class="line">&quot;  expires INTEGER,\n&quot;</div><div class="line">&quot;  modified INTEGER,\n&quot;</div><div class="line">&quot;  etag TEXT,\n&quot;</div><div class="line">&quot;  data BLOB,\n&quot;</div><div class="line">&quot;  compressed INTEGER NOT NULL DEFAULT 0,\n&quot;</div><div class="line">&quot;  accessed INTEGER NOT NULL,\n&quot;</div><div class="line">&quot;  must_revalidate INTEGER NOT NULL DEFAULT 0,\n&quot;</div><div class="line">&quot;  UNIQUE (url)\n&quot;</div><div class="line">&quot;);\n&quot;</div><div class="line">&quot;CREATE TABLE tiles (\n&quot;</div><div class="line">&quot;  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n&quot;</div><div class="line">&quot;  url_template TEXT NOT NULL,\n&quot;</div><div class="line">&quot;  pixel_ratio INTEGER NOT NULL,\n&quot;</div><div class="line">&quot;  z INTEGER NOT NULL,\n&quot;</div><div class="line">&quot;  x INTEGER NOT NULL,\n&quot;</div><div class="line">&quot;  y INTEGER NOT NULL,\n&quot;</div><div class="line">&quot;  expires INTEGER,\n&quot;</div><div class="line">&quot;  modified INTEGER,\n&quot;</div><div class="line">&quot;  etag TEXT,\n&quot;</div><div class="line">&quot;  data BLOB,\n&quot;</div><div class="line">&quot;  compressed INTEGER NOT NULL DEFAULT 0,\n&quot;</div><div class="line">&quot;  accessed INTEGER NOT NULL,\n&quot;</div><div class="line">&quot;  must_revalidate INTEGER NOT NULL DEFAULT 0,\n&quot;</div><div class="line">&quot;  UNIQUE (url_template, pixel_ratio, z, x, y)\n&quot;</div><div class="line">&quot;);\n&quot;</div><div class="line">&quot;CREATE TABLE regions (\n&quot;</div><div class="line">&quot;  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n&quot;</div><div class="line">&quot;  definition TEXT NOT NULL,\n&quot;</div><div class="line">&quot;  description BLOB\n&quot;</div><div class="line">&quot;);\n&quot;</div><div class="line">&quot;CREATE TABLE region_resources (\n&quot;</div><div class="line">&quot;  region_id INTEGER NOT NULL REFERENCES regions(id) ON DELETE CASCADE,\n&quot;</div><div class="line">&quot;  resource_id INTEGER NOT NULL REFERENCES resources(id),\n&quot;</div><div class="line">&quot;  UNIQUE (region_id, resource_id)\n&quot;</div><div class="line">&quot;);\n&quot;</div><div class="line">&quot;CREATE TABLE region_tiles (\n&quot;</div><div class="line">&quot;  region_id INTEGER NOT NULL REFERENCES regions(id) ON DELETE CASCADE,\n&quot;</div><div class="line">&quot;  tile_id INTEGER NOT NULL REFERENCES tiles(id),\n&quot;</div><div class="line">&quot;  UNIQUE (region_id, tile_id)\n&quot;</div><div class="line">&quot;);\n&quot;</div><div class="line">&quot;CREATE INDEX resources_accessed\n&quot;</div><div class="line">&quot;ON resources (accessed);\n&quot;</div><div class="line">&quot;CREATE INDEX tiles_accessed\n&quot;</div><div class="line">&quot;ON tiles (accessed);\n&quot;</div><div class="line">&quot;CREATE INDEX region_resources_resource_id\n&quot;</div><div class="line">&quot;ON region_resources (resource_id);\n&quot;</div><div class="line">&quot;CREATE INDEX region_tiles_tile_id\n&quot;</div><div class="line">&quot;ON region_tiles (tile_id);\n&quot;</div><div class="line">;</div></pre></td></tr></table></figure></p>
+<p>看到这里我们明白了，这里将相关创建表的语句定义成schema变量，通过＃include引入到代码中，然后通过db-&gt;exec(schema)执行创建表，有关数据库初始化的过程就到这里了</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/03/30/android/android性能优化/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          android性能优化
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/29/mapbox/Mapbox源码分析之发送请求/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Mapbox源码分析之发送请求&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

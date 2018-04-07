@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>android-Monkey压力测试 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:Monkey是一个运行在你的模拟器或设备上，并生成伪随机的用户事件流，如点击，触摸或手势，以及一些系统级事件的程序。你可以使用Monkey以随机但可重复的方式对您正在开发的应用程序进行压力测试。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android-Monkey压力测试">
+<meta property="og:url" content="http://yoursite.com/2018/03/22/android/android-Monkey压力测试/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:Monkey是一个运行在你的模拟器或设备上，并生成伪随机的用户事件流，如点击，触摸或手势，以及一些系统级事件的程序。你可以使用Monkey以随机但可重复的方式对您正在开发的应用程序进行压力测试。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-07T14:31:51.854Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="android-Monkey压力测试">
+<meta name="twitter:description" content="简介:Monkey是一个运行在你的模拟器或设备上，并生成伪随机的用户事件流，如点击，触摸或手势，以及一些系统级事件的程序。你可以使用Monkey以随机但可重复的方式对您正在开发的应用程序进行压力测试。">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-android/android-Monkey压力测试" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      android-Monkey压力测试
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/22/android/android-Monkey压力测试/" class="article-date">
+  <time datetime="2018-03-22T01:36:35.000Z" itemprop="datePublished">2018-03-22</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/android/">android</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>Monkey是一个运行在你的模拟器或设备上，并生成伪随机的用户事件流，如点击，触摸或手势，以及一些系统级事件的程序。你可以使用Monkey以随机但可重复的方式对您正在开发的应用程序进行压力测试。<br><a id="more"></a> </p>
+<h4 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h4><p>Monkey命令选项主要分为下面4个类别</p>
+<ul>
+<li>基本配置选项，例如设置要尝试的事件数量。</li>
+<li>操作上的限制，比如将测试限制在一个包中。</li>
+<li>事件类型和频率。</li>
+<li>调试选项。</li>
+</ul>
+<h4 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">adb shell monkey [options] &lt;event-count&gt;</div></pre></td></tr></table></figure>
+<p>例如：adb shell monkey -p your.package.name -v 500</p>
+<p>停止Monkey<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">adb shell ps | grep monkey</div><div class="line">adb shell kill -9 (monkey进程id)</div></pre></td></tr></table></figure></p>
+<p>这里我们做一个简单的demo,故意在执行某些按钮时出错，然后执行Ｍonkey命令，我们看一下log<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div></pre></td><td class="code"><pre><div class="line">:Monkey: seed=<span class="number">1521909354914</span> count=<span class="number">500</span></div><div class="line">:AllowPackage: com.test.testmonkey</div><div class="line">:IncludeCategory: android.intent.category.LAUNCHER</div><div class="line">:IncludeCategory: android.intent.category.MONKEY</div><div class="line"><span class="comment">// Event percentages:</span></div><div class="line"><span class="comment">//   0: 15.0%</span></div><div class="line"><span class="comment">//   1: 10.0%</span></div><div class="line"><span class="comment">//   2: 2.0%</span></div><div class="line"><span class="comment">//   3: 15.0%</span></div><div class="line"><span class="comment">//   4: -0.0%</span></div><div class="line"><span class="comment">//   5: -0.0%</span></div><div class="line"><span class="comment">//   6: 25.0%</span></div><div class="line"><span class="comment">//   7: 15.0%</span></div><div class="line"><span class="comment">//   8: 2.0%</span></div><div class="line"><span class="comment">//   9: 2.0%</span></div><div class="line"><span class="comment">//   10: 1.0%</span></div><div class="line"><span class="comment">//   11: 13.0%</span></div><div class="line">:Switch: #Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;launchFlags=0x10200000;component=com.test.testmonkey/.MainActivity;end</div><div class="line">    <span class="comment">// Allowing start of Intent &#123; act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.test.testmonkey/.MainActivity &#125; in package com.test.testmonkey</span></div><div class="line">:<span class="function">Sending <span class="title">Trackball</span> <span class="params">(ACTION_MOVE)</span>: 0:<span class="params">(<span class="number">-5.0</span>,<span class="number">2.0</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Touch</span> <span class="params">(ACTION_DOWN)</span>: 0:<span class="params">(<span class="number">663.0</span>,<span class="number">1398.0</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Touch</span> <span class="params">(ACTION_UP)</span>: 0:<span class="params">(<span class="number">675.4298</span>,<span class="number">1380.5249</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Touch</span> <span class="params">(ACTION_DOWN)</span>: 0:<span class="params">(<span class="number">131.0</span>,<span class="number">904.0</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Touch</span> <span class="params">(ACTION_UP)</span>: 0:<span class="params">(<span class="number">132.98947</span>,<span class="number">909.7895</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Touch</span> <span class="params">(ACTION_DOWN)</span>: 0:<span class="params">(<span class="number">1151.0</span>,<span class="number">926.0</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Touch</span> <span class="params">(ACTION_UP)</span>: 0:<span class="params">(<span class="number">1200.0</span>,<span class="number">860.2331</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Touch</span> <span class="params">(ACTION_DOWN)</span>: 0:<span class="params">(<span class="number">922.0</span>,<span class="number">1108.0</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Touch</span> <span class="params">(ACTION_UP)</span>: 0:<span class="params">(<span class="number">1042.3059</span>,<span class="number">1175.9828</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Touch</span> <span class="params">(ACTION_DOWN)</span>: 0:<span class="params">(<span class="number">1010.0</span>,<span class="number">1630.0</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Touch</span> <span class="params">(ACTION_UP)</span>: 0:<span class="params">(<span class="number">1008.4201</span>,<span class="number">1648.7831</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Touch</span> <span class="params">(ACTION_DOWN)</span>: 0:<span class="params">(<span class="number">403.0</span>,<span class="number">295.0</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Touch</span> <span class="params">(ACTION_UP)</span>: 0:<span class="params">(<span class="number">394.41992</span>,<span class="number">296.91928</span>)</span></span></div><div class="line"><span class="function">:Sending <span class="title">Trackball</span> <span class="params">(ACTION_MOVE)</span>: 0:<span class="params">(<span class="number">3.0</span>,<span class="number">-5.0</span>)</span></span></div><div class="line"><span class="function"><span class="comment">// CRASH: com.test.testmonkey (pid 14561)</span></span></div><div class="line"><span class="function"><span class="comment">// Short Msg: android.content.ActivityNotFoundException</span></span></div><div class="line"><span class="function"><span class="comment">// Long Msg: android.content.ActivityNotFoundException: Unable to find explicit activity class &#123;com.test.testmonkey/com.test.testmonkey.TestActivity&#125;; have you declared this activity in your AndroidManifest.xml?</span></span></div><div class="line"><span class="function"><span class="comment">// Build Label: HUAWEI/M2/HWMozart:6.0/HUAWEIM2-803L/C233B216:user/release-keys</span></span></div><div class="line"><span class="function"><span class="comment">// Build Changelist: C233B216</span></span></div><div class="line"><span class="function"><span class="comment">// Build Time: 1491840570000</span></span></div><div class="line"><span class="function"><span class="comment">// android.content.ActivityNotFoundException: Unable to find explicit activity class &#123;com.test.testmonkey/com.test.testmonkey.TestActivity&#125;; have you declared this activity in your AndroidManifest.xml?</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.app.Instrumentation.checkStartActivityResult(Instrumentation.java:1805)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.app.Instrumentation.execStartActivity(Instrumentation.java:1523)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.app.Activity.startActivityForResult(Activity.java:4030)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.support.v4.app.BaseFragmentActivityApi16.startActivityForResult(BaseFragmentActivityApi16.java:54)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.support.v4.app.FragmentActivity.startActivityForResult(FragmentActivity.java:67)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.app.Activity.startActivityForResult(Activity.java:3984)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.support.v4.app.FragmentActivity.startActivityForResult(FragmentActivity.java:720)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.app.Activity.startActivity(Activity.java:4314)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.app.Activity.startActivity(Activity.java:4282)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at com.test.testmonkey.MainActivity$1.onClick(MainActivity.java:17)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.view.View.performClick(View.java:5264)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.view.View$PerformClick.run(View.java:21297)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.os.Handler.handleCallback(Handler.java:743)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.os.Handler.dispatchMessage(Handler.java:95)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.os.Looper.loop(Looper.java:150)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at android.app.ActivityThread.main(ActivityThread.java:5546)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at java.lang.reflect.Method.invoke(Native Method)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:792)</span></span></div><div class="line"><span class="function"><span class="comment">// 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:682)</span></span></div><div class="line"><span class="function"><span class="comment">// </span></span></div><div class="line"><span class="function">** Monkey aborted due to error.</span></div><div class="line"><span class="function">Events injected: 82</span></div><div class="line"><span class="function">:Sending rotation degree</span>=<span class="number">0</span>, persist=<span class="keyword">false</span></div><div class="line">:Dropped: keys=<span class="number">0</span> pointers=<span class="number">0</span> trackballs=<span class="number">0</span> flips=<span class="number">0</span> rotations=<span class="number">0</span></div><div class="line">## Network stats: elapsed time=812ms (0ms mobile, 0ms wifi, 812ms not connected)</div><div class="line">** System appears to have crashed at event <span class="number">82</span> of <span class="number">500</span> using seed <span class="number">1521909354914</span></div></pre></td></tr></table></figure></p>
+<p>这里我们可以看到Ｍonkey遇到程序出错时会自动停下来，并且显示错误信息</p>
+<h4 id="命令选项"><a href="#命令选项" class="headerlink" title="命令选项"></a>命令选项</h4><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一般　　　　　</td>
+<td>–help</td>
+<td>打印使用帮助</td>
+</tr>
+<tr>
+<td></td>
+<td>-v</td>
+<td>每一个 -v都增加输出信息的详细级别　默认级别为０</td>
+</tr>
+<tr>
+<td>事件　　　　　</td>
+<td>-s</td>
+<td>设置种子值，如果种子值相同，将会生成相同的事件　</td>
+</tr>
+<tr>
+<td></td>
+<td>–throttle</td>
+<td>在事件之间增加延迟　</td>
+</tr>
+<tr>
+<td></td>
+<td>–pct-touch</td>
+<td>调整触摸事件的百分比　　　　　　　　　　　　　</td>
+</tr>
+<tr>
+<td></td>
+<td>–pct-motion</td>
+<td>调整滑动事件的百分比　　　　　　　　　　　　　　</td>
+</tr>
+<tr>
+<td></td>
+<td>–pct-trackball</td>
+<td>调整轨迹球事件的百分比。</td>
+</tr>
+<tr>
+<td></td>
+<td>–pct-nav</td>
+<td>调整“基本”导航事件的百分比。</td>
+</tr>
+<tr>
+<td></td>
+<td>–pct-majornav</td>
+<td>调整“主要”导航事件的百分比。</td>
+</tr>
+<tr>
+<td></td>
+<td>–pct-syskeys</td>
+<td>调整“系统”关键事件的百分比。</td>
+</tr>
+<tr>
+<td></td>
+<td>–pct-appswitch</td>
+<td>调整活动启动的百分比。</td>
+</tr>
+<tr>
+<td></td>
+<td>–pct-anyevent</td>
+<td>调整其他类型事件的百分比。</td>
+</tr>
+<tr>
+<td>约束　　　　　</td>
+<td>-p</td>
+<td>指定一个或多个允许运行的软件包　　　　　　　　　</td>
+</tr>
+<tr>
+<td></td>
+<td>-c</td>
+<td>指定类别　　　　　　　　　　　　　　　　　　　</td>
+</tr>
+<tr>
+<td>调试　　　　　</td>
+<td>–dbg-no-events</td>
+<td>Monkey将执行启动到测试活动中，不会生成任何其他事件</td>
+</tr>
+<tr>
+<td></td>
+<td>–hprof</td>
+<td>将在Monkey事件序列之前和之后立即生成分析报告,谨慎使用</td>
+</tr>
+<tr>
+<td></td>
+<td>–ignore-crashes</td>
+<td>Monkey将执行完所有次数，即使碰到crash也不停止　</td>
+</tr>
+<tr>
+<td></td>
+<td>–ignore-timeouts</td>
+<td>碰到应用响应超时也不停止　　　　　　　　　　　　</td>
+</tr>
+<tr>
+<td></td>
+<td>–ignore-security-exceptions</td>
+<td>忽略权限错误　　　　　　　　　　　　</td>
+</tr>
+<tr>
+<td></td>
+<td>–kill-process-after-error</td>
+<td>杀掉发生错误的进程　　　　　　　　　　</td>
+</tr>
+<tr>
+<td></td>
+<td>–monitor-native-crashes</td>
+<td>观察并报告Android系统发生的崩溃,如果设置了–kill-process-after-error，系统将停止</td>
+</tr>
+<tr>
+<td></td>
+<td>–wait-dbg　　　　</td>
+<td>停止执行Monkey，直到调试器连接到它。</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/03/23/mapbox/Mapbox源码分析之地图渲染/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          Mapbox源码分析之地图渲染
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/19/gradle/Gradle-构建javadoc文档/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Gradle-构建javadoc文档&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

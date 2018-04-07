@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Mapbox源码分析之样式加载 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:通过源码，我们来一步步分析Mapbox地图引擎如何进行不同样式的数据加载的，这里是基于5.3.0的版本．">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mapbox源码分析之样式加载">
+<meta property="og:url" content="http://yoursite.com/2018/03/26/mapbox/Mapbox源码分析之样式加载/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:通过源码，我们来一步步分析Mapbox地图引擎如何进行不同样式的数据加载的，这里是基于5.3.0的版本．">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-07T14:31:51.857Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mapbox源码分析之样式加载">
+<meta name="twitter:description" content="简介:通过源码，我们来一步步分析Mapbox地图引擎如何进行不同样式的数据加载的，这里是基于5.3.0的版本．">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-mapbox/Mapbox源码分析之样式加载" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Mapbox源码分析之样式加载
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/26/mapbox/Mapbox源码分析之样式加载/" class="article-date">
+  <time datetime="2018-03-26T01:59:59.000Z" itemprop="datePublished">2018-03-26</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mapbox/">mapbox</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>通过源码，我们来一步步分析Mapbox地图引擎如何进行不同样式的数据加载的，这里是基于5.3.0的版本．<br><a id="more"></a>  </p>
+<p>通过官网案例，我们知道在SDK中配置了不同的style样式给我们使用，通过配置不同style,便可加载不同的类型地图，那么我们便可以从setStyleUrl()这个方法着手．这里我们从MapView的setStyleUrl()方法看起<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setStyleUrl</span><span class="params">(@NonNull String url)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (destroyed) &#123;</div><div class="line">      <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (!isMapInitialized()) &#123;</div><div class="line">      mapboxMapOptions.styleUrl(url);</div><div class="line">      <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    nativeMapView.setStyleUrl(url);</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到，他将相关配置直接往下传到底层了，从nativeMapView这个名字可以看出这是一个和原生相关的地图类，那么我们发现即使不传任何style,地图也会初始化一个默认样式的地图，那么这个默认地图是在哪配置的呢，我们使用AndroidStudio的Find Usages功能，我们看到MapboxMap这个类中的onStart()方法也使用了这个方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</div><div class="line">   nativeMapView.update();</div><div class="line">   trackingSettings.onStart();</div><div class="line">   <span class="keyword">if</span> (TextUtils.isEmpty(nativeMapView.getStyleUrl())) &#123;</div><div class="line">     <span class="comment">// if user hasn't loaded a Style yet</span></div><div class="line">     nativeMapView.setStyleUrl(Style.MAPBOX_STREETS);</div><div class="line">   &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+<p>我们继续Find Usages这个方法，看看在哪里调用的，我们发现在MapView的initialiseDrawingSurface()方法里初始化画布的同时，也初始化了地图<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">mapRenderer = <span class="keyword">new</span> GLSurfaceViewMapRenderer(getContext(), glSurfaceView) &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSurfaceCreated</span><span class="params">(GL10 gl, EGLConfig config)</span> </span>&#123;</div><div class="line">          MapView.<span class="keyword">this</span>.post(<span class="keyword">new</span> Runnable() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">              <span class="comment">// Initialise only once</span></div><div class="line">              <span class="keyword">if</span> (mapboxMap == <span class="keyword">null</span>) &#123;</div><div class="line">                initialiseMap();</div><div class="line">                mapboxMap.onStart();</div><div class="line">              &#125;</div><div class="line">            &#125;</div><div class="line">          &#125;);</div><div class="line"></div><div class="line">          <span class="keyword">super</span>.onSurfaceCreated(gl, config);</div><div class="line">        &#125;</div><div class="line">      &#125;;</div></pre></td></tr></table></figure></p>
+<p>到这里，加载默认样式已经很清晰了，我们继续看nativeMapView.setStyleUrl()方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setStyleUrl</span><span class="params">(String url)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (isDestroyedOn(<span class="string">"setStyleUrl"</span>)) &#123;</div><div class="line">      <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    nativeSetStyleUrl(url);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title">nativeSetStyleUrl</span><span class="params">(String url)</span></span>;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到这里将配置简单的往底层传，便没做什么了，这里我们全局搜索一下nativeSetStyleUrl字符串，看到和NativeMapView对应的底层原生文件native_map_view.cpp中<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> NativeMapView::registerNative(jni::JNIEnv&amp; env) &#123;</div><div class="line">    <span class="comment">// Lookup the class</span></div><div class="line">    NativeMapView::javaClass = *jni::Class&lt;NativeMapView&gt;::Find(env).NewGlobalRef(env).release();</div><div class="line"></div><div class="line">    <span class="meta">#<span class="meta-keyword">define</span> METHOD(MethodPtr, name) jni::MakeNativePeerMethod<span class="meta-string">&lt;decltype(MethodPtr), (MethodPtr)&gt;(name)</span></span></div><div class="line"></div><div class="line">    <span class="comment">// Register the peer</span></div><div class="line">    jni::RegisterNativePeer&lt;NativeMapView&gt;(env, NativeMapView::javaClass, <span class="string">"nativePtr"</span>,</div><div class="line">            <span class="built_in">std</span>::make_unique&lt;NativeMapView, JNIEnv&amp;, jni::Object&lt;NativeMapView&gt;, jni::Object&lt;FileSource&gt;, jni::Object&lt;MapRenderer&gt;, jni::jfloat&gt;,</div><div class="line">            <span class="string">"nativeInitialize"</span>,</div><div class="line">            <span class="string">"nativeDestroy"</span>,</div><div class="line">            <span class="comment">//省略</span></div><div class="line">            METHOD(&amp;NativeMapView::setStyleUrl, <span class="string">"nativeSetStyleUrl"</span>),</div><div class="line">           　<span class="comment">//省略</span></div><div class="line">    );</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到这里将setStyleUrl()方法和nativeSetStyleUrl()方法进行绑定，我们看下底层NativeMapView的setStyleUrl()方法<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> NativeMapView::setStyleUrl(jni::JNIEnv&amp; env, jni::String url) &#123;</div><div class="line">    <span class="built_in">map</span>-&gt;getStyle().loadURL(jni::Make&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;(env, url));</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到它调用了MapView的getStyle()方法，拿到Map::Impl的Style对象，然后调用Style对象的loadURL()方法<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">style::Style&amp; Map::getStyle() &#123;</div><div class="line">    <span class="keyword">return</span> *impl-&gt;style;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看下Style对象的loadURL()方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> Style::loadURL(<span class="keyword">const</span> std::string&amp; url) &#123;</div><div class="line">    impl-&gt;loadURL(url);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>它又转给它自己的实现类的方法了，这里我们看下Style::Impl的loadURL()方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> Style::Impl::loadURL(<span class="keyword">const</span> std::string&amp; url_) &#123;</div><div class="line">    lastError = nullptr;</div><div class="line">    observer-&gt;onStyleLoading();</div><div class="line"></div><div class="line">    loaded = <span class="keyword">false</span>;</div><div class="line">    url = url_;</div><div class="line"></div><div class="line">    styleRequest = fileSource.request(Resource::style(url), [<span class="keyword">this</span>](Response res) &#123;</div><div class="line">        <span class="comment">// Once we get a fresh style, or the style is mutated, stop revalidating.</span></div><div class="line">        <span class="keyword">if</span> (res.isFresh() || mutated) &#123;</div><div class="line">            styleRequest.reset();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// Don't allow a loaded, mutated style to be overwritten with a new version.</span></div><div class="line">        <span class="keyword">if</span> (mutated &amp;&amp; loaded) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (res.error) &#123;</div><div class="line">            <span class="keyword">const</span> std::string message = <span class="string">"loading style failed: "</span> + res.error-&gt;message;</div><div class="line">            Log::Error(Event::Setup, message.c_str());</div><div class="line">            observer-&gt;onStyleError(std::make_exception_ptr(util::StyleLoadException(message)));</div><div class="line">            observer-&gt;onResourceError(std::make_exception_ptr(std::runtime_error(res.error-&gt;message)));</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (res.notModified || res.noContent) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            parse(*res.data);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到它首先通知观察者样式正在加载中，然后调用fileSource.request()方法，这里我们看下参数，一个通过Resource的style方法将url分类然后封装成Resource对象，另一个则是回调函数，用于处理获取的响应数据Response<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Resource Resource::style(<span class="keyword">const</span> std::string&amp; url) &#123;</div><div class="line">    <span class="keyword">return</span> Resource &#123;</div><div class="line">        Resource::Kind::Style,</div><div class="line">        url</div><div class="line">    &#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们往下看，看看如果处理请求的数据的，我们看到回调函数中有这么一行代码，parse(*res.data);从名字上看，这应该是解析数据的函数，我们看下具体实现<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> Style::Impl::parse(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; json_) &#123;</div><div class="line">    Parser parser;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">auto</span> error = parser.parse(json_)) &#123;</div><div class="line">        <span class="built_in">std</span>::<span class="built_in">string</span> message = <span class="string">"Failed to parse style: "</span> + util::toString(error);</div><div class="line">        Log::Error(Event::ParseStyle, message.c_str());</div><div class="line">        observer-&gt;onStyleError(<span class="built_in">std</span>::make_exception_ptr(util::StyleParseException(message)));</div><div class="line">        observer-&gt;onResourceError(error);</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    mutated = <span class="literal">false</span>;</div><div class="line">    loaded = <span class="literal">false</span>;</div><div class="line">    json = json_;</div><div class="line"></div><div class="line">    sources.clear();</div><div class="line">    layers.clear();</div><div class="line">    images.clear();</div><div class="line"></div><div class="line">    transitionOptions = &#123;&#125;;</div><div class="line">    transitionOptions.duration = util::DEFAULT_TRANSITION_DURATION;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; source : parser.sources) &#123;</div><div class="line">        addSource(<span class="built_in">std</span>::move(source));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; layer : parser.layers) &#123;</div><div class="line">        addLayer(<span class="built_in">std</span>::move(layer));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    name = parser.name;</div><div class="line">    defaultCamera.center = parser.latLng;</div><div class="line">    defaultCamera.zoom = parser.zoom;</div><div class="line">    defaultCamera.angle = parser.bearing;</div><div class="line">    defaultCamera.pitch = parser.pitch;</div><div class="line"></div><div class="line">    setLight(<span class="built_in">std</span>::make_unique&lt;Light&gt;(parser.light));</div><div class="line"></div><div class="line">    spriteLoaded = <span class="literal">false</span>;</div><div class="line">    spriteLoader-&gt;load(parser.spriteURL, scheduler, fileSource);</div><div class="line">    glyphURL = parser.glyphURL;</div><div class="line"></div><div class="line">    loaded = <span class="literal">true</span>;</div><div class="line">    observer-&gt;onStyleLoaded();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到通过Parser.parse()方法将解析的json字符串进行解析，然后进行一些数据的配置，包括数据源，图层，精灵，字体，默认缩放等级和经纬度，方向等等，最后调用onStyleLoaded()方法通知观察者样式加载结束.</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/03/26/mapbox/Mapbox源码分析之库加载/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          Mapbox源码分析之库加载
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/23/mapbox/Mapbox源码分析之地图渲染/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Mapbox源码分析之地图渲染&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

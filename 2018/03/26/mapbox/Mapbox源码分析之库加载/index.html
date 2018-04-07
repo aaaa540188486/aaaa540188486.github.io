@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Mapbox源码分析之库加载 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:通过源码，我们来一步步分析Mapbox地图引擎原生库加载的流程，这里是基于5.3.0的版本．">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mapbox源码分析之库加载">
+<meta property="og:url" content="http://yoursite.com/2018/03/26/mapbox/Mapbox源码分析之库加载/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:通过源码，我们来一步步分析Mapbox地图引擎原生库加载的流程，这里是基于5.3.0的版本．">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-07T14:31:51.856Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mapbox源码分析之库加载">
+<meta name="twitter:description" content="简介:通过源码，我们来一步步分析Mapbox地图引擎原生库加载的流程，这里是基于5.3.0的版本．">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-mapbox/Mapbox源码分析之库加载" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Mapbox源码分析之库加载
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/26/mapbox/Mapbox源码分析之库加载/" class="article-date">
+  <time datetime="2018-03-26T08:44:15.000Z" itemprop="datePublished">2018-03-26</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mapbox/">mapbox</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>通过源码，我们来一步步分析Mapbox地图引擎原生库加载的流程，这里是基于5.3.0的版本．<br><a id="more"></a>  </p>
+<p>当在代码中调用System.loadLibrary函数时，该函数会找到对应的动态库，然后找到”JNI_OnLoad”函数，如果该函数存在，则调用它，这里我们看到原生库下有一个main.cpp文件中包含这个方法，即这是库加载的入口<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">extern</span> <span class="string">"C"</span> <span class="function">JNIEXPORT jint <span class="title">JNI_OnLoad</span><span class="params">(JavaVM *vm, <span class="keyword">void</span> *)</span> </span>&#123;</div><div class="line">    assert(vm != <span class="literal">nullptr</span>);</div><div class="line">    mbgl::android::registerNatives(vm);</div><div class="line">    <span class="keyword">return</span> JNI_VERSION_1_6;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到它调用了registerNatives函数，我们在它包含的jni.cpp中找到该函数<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">registerNatives</span><span class="params">(JavaVM *vm)</span> </span>&#123;</div><div class="line">    theJVM = vm;</div><div class="line"></div><div class="line">    jni::JNIEnv&amp; env = jni::GetEnv(*vm, jni::jni_version_1_6);</div><div class="line"></div><div class="line">    <span class="comment">// For the DefaultFileSource</span></div><div class="line">    <span class="keyword">static</span> mbgl::util::RunLoop mainRunLoop;</div><div class="line">    FileSource::registerNative(env);</div><div class="line"></div><div class="line">    <span class="comment">// Basic types</span></div><div class="line">    java::registerNatives(env);</div><div class="line">    java::util::registerNative(env);</div><div class="line">    PointF::registerNative(env);</div><div class="line">    RectF::registerNative(env);</div><div class="line"></div><div class="line">    <span class="comment">// GeoJSON</span></div><div class="line">    geojson::Feature::registerNative(env);</div><div class="line">    geojson::FeatureCollection::registerNative(env);</div><div class="line">    geojson::Geometry::registerNative(env);</div><div class="line">    geojson::LineString::registerNative(env);</div><div class="line">    geojson::MultiLineString::registerNative(env);</div><div class="line">    geojson::MultiPoint::registerNative(env);</div><div class="line">    geojson::MultiPolygon::registerNative(env);</div><div class="line">    geojson::Point::registerNative(env);</div><div class="line">    geojson::Polygon::registerNative(env);</div><div class="line">    geojson::Position::registerNative(env);</div><div class="line"></div><div class="line">    <span class="comment">// Geometry</span></div><div class="line">    LatLng::registerNative(env);</div><div class="line">    LatLngBounds::registerNative(env);</div><div class="line">    LatLngQuad::registerNative(env);</div><div class="line">    ProjectedMeters::registerNative(env);</div><div class="line"></div><div class="line">    <span class="comment">// GSon</span></div><div class="line">    gson::JsonArray::registerNative(env);</div><div class="line">    gson::JsonElement::registerNative(env);</div><div class="line">    gson::JsonObject::registerNative(env);</div><div class="line">    gson::JsonPrimitive::registerNative(env);</div><div class="line"></div><div class="line">    <span class="comment">//Annotation</span></div><div class="line">    Marker::registerNative(env);</div><div class="line">    Polygon::registerNative(env);</div><div class="line">    Polyline::registerNative(env);</div><div class="line"></div><div class="line">    <span class="comment">// Map</span></div><div class="line">    MapRenderer::registerNative(env);</div><div class="line">    MapRendererRunnable::registerNative(env);</div><div class="line">    NativeMapView::registerNative(env);</div><div class="line"></div><div class="line">    <span class="comment">// Http</span></div><div class="line">    RegisterNativeHTTPRequest(env);</div><div class="line"></div><div class="line">    <span class="comment">// Bitmap</span></div><div class="line">    Bitmap::registerNative(env);</div><div class="line">    BitmapFactory::registerNative(env);</div><div class="line"></div><div class="line">    <span class="comment">// Style</span></div><div class="line">    TransitionOptions::registerNative(env);</div><div class="line">    registerNativeLayers(env);</div><div class="line">    registerNativeSources(env);</div><div class="line">    Light::registerNative(env);</div><div class="line">    Position::registerNative(env);</div><div class="line">    Stop::registerNative(env);</div><div class="line">    CategoricalStops::registerNative(env);</div><div class="line">    ExponentialStops::registerNative(env);</div><div class="line">    IdentityStops::registerNative(env);</div><div class="line">    IntervalStops::registerNative(env);</div><div class="line"></div><div class="line">    <span class="comment">// Map</span></div><div class="line">    CameraPosition::registerNative(env);</div><div class="line">    Image::registerNative(env);</div><div class="line"></div><div class="line">    <span class="comment">// Connectivity</span></div><div class="line">    ConnectivityListener::registerNative(env);</div><div class="line"></div><div class="line">    <span class="comment">// Offline</span></div><div class="line">    OfflineManager::registerNative(env);</div><div class="line">    OfflineRegion::registerNative(env);</div><div class="line">    OfflineRegionDefinition::registerNative(env);</div><div class="line">    OfflineTilePyramidRegionDefinition::registerNative(env);</div><div class="line">    OfflineRegionError::registerNative(env);</div><div class="line">    OfflineRegionStatus::registerNative(env);</div><div class="line"></div><div class="line">    <span class="comment">// Snapshotter</span></div><div class="line">    MapSnapshotter::registerNative(env);</div><div class="line">    MapSnapshot::registerNative(env);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到，它对底层相关类进行了注册，这里我们随便找一个类看一下，例如FileSource类，我们找到file_source.cpp文件<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> FileSource::registerNative(jni::JNIEnv&amp; env) &#123;</div><div class="line">    <span class="comment">//Register classes</span></div><div class="line">    FileSource::javaClass = *jni::Class&lt;FileSource&gt;::Find(env).NewGlobalRef(env).release();</div><div class="line">    FileSource::ResourceTransformCallback::javaClass = *jni::Class&lt;FileSource::ResourceTransformCallback&gt;::Find(env).NewGlobalRef(env).release();</div><div class="line"></div><div class="line">    <span class="meta">#<span class="meta-keyword">define</span> METHOD(MethodPtr, name) jni::MakeNativePeerMethod<span class="meta-string">&lt;decltype(MethodPtr), (MethodPtr)&gt;(name)</span></span></div><div class="line"></div><div class="line">    <span class="comment">// Register the peer</span></div><div class="line">    jni::RegisterNativePeer&lt;FileSource&gt;(</div><div class="line">        env, FileSource::javaClass, <span class="string">"nativePtr"</span>,</div><div class="line">        <span class="built_in">std</span>::make_unique&lt;FileSource, JNIEnv&amp;, jni::String, jni::String, jni::Object&lt;AssetManager&gt;&gt;,</div><div class="line">        <span class="string">"initialize"</span>,</div><div class="line">        <span class="string">"finalize"</span>,</div><div class="line">        METHOD(&amp;FileSource::getAccessToken, <span class="string">"getAccessToken"</span>),</div><div class="line">        METHOD(&amp;FileSource::setAccessToken, <span class="string">"setAccessToken"</span>),</div><div class="line">        METHOD(&amp;FileSource::setAPIBaseUrl, <span class="string">"setApiBaseUrl"</span>),</div><div class="line">        METHOD(&amp;FileSource::setResourceTransform, <span class="string">"setResourceTransform"</span>),</div><div class="line">        METHOD(&amp;FileSource::resume, <span class="string">"activate"</span>),</div><div class="line">        METHOD(&amp;FileSource::pause, <span class="string">"deactivate"</span>)</div><div class="line">    );</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>看到这里我们就看到了很多不熟悉的方法了，例如*jni.Class&lt;&gt;,Find(),NewGlobalRel(),RegisterNativePeer&lt;&gt;等，但即时如此，我们大概能看出这是找到对应类，并进行注册，我们看到这些方法都来自一个jni.hpp这个包里，我们在mason_packages包下面的headers包找到这些第三方引入的包，其中便有jni.hpp,那什么时候导入这个包的呢，这里我们返回根目录找到platform.android包下config.cmake文件，其中便有这么一行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mason_use(jni.hpp VERSION 3.0.0 HEADER_ONLY)</div></pre></td></tr></table></figure></p>
+<p>我们找到jni.hpp包下面的readme文件查看介绍，这是一个用c++14封装的新的类型安全，仅包含头部文件的jni库，比较方便的进行c++与java之间的调用等，下面是jni.hpp的github地址,相关使用这个库的细节，这里就不一一介绍了．<br><a href="https://github.com/mapbox/jni.hpp/" target="_blank" rel="external">https://github.com/mapbox/jni.hpp/</a></p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/03/27/mapbox/Mapbox源码分析之url解析/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          Mapbox源码分析之url解析
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/26/mapbox/Mapbox源码分析之样式加载/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Mapbox源码分析之样式加载&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

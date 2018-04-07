@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Mapbox源码分析之地图渲染 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:通过源码，我们来一步步分析Mapbox地图引擎如何进行不同数据源的地图渲染的，这里是基于5.3.0的版本．">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mapbox源码分析之地图渲染">
+<meta property="og:url" content="http://yoursite.com/2018/03/23/mapbox/Mapbox源码分析之地图渲染/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:通过源码，我们来一步步分析Mapbox地图引擎如何进行不同数据源的地图渲染的，这里是基于5.3.0的版本．">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-07T14:31:51.856Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mapbox源码分析之地图渲染">
+<meta name="twitter:description" content="简介:通过源码，我们来一步步分析Mapbox地图引擎如何进行不同数据源的地图渲染的，这里是基于5.3.0的版本．">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-mapbox/Mapbox源码分析之地图渲染" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Mapbox源码分析之地图渲染
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/03/23/mapbox/Mapbox源码分析之地图渲染/" class="article-date">
+  <time datetime="2018-03-23T06:19:46.000Z" itemprop="datePublished">2018-03-23</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mapbox/">mapbox</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>通过源码，我们来一步步分析Mapbox地图引擎如何进行不同数据源的地图渲染的，这里是基于5.3.0的版本．<br><a id="more"></a>  </p>
+<p>首先，我们找到地图的核心类，MapView,这个view就是用来显示地图的，它是在mapbox.mapboxsdk.maps包下，看到它的初始化之后，发现它有这么一个方法，叫做initialiseDrawingSurface(),从名字上看可以看出这是一个初始化画布的方法，我们看下它的实现．<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initialiseDrawingSurface</span><span class="params">(MapboxMapOptions options)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (options.getTextureMode()) &#123;</div><div class="line">      TextureView textureView = <span class="keyword">new</span> TextureView(getContext());</div><div class="line">      mapRenderer = <span class="keyword">new</span> TextureViewMapRenderer(getContext(), textureView) &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onSurfaceCreated</span><span class="params">(GL10 gl, EGLConfig config)</span> </span>&#123;</div><div class="line">          MapView.<span class="keyword">this</span>.post(<span class="keyword">new</span> Runnable() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">              <span class="comment">// Initialise only once</span></div><div class="line">              <span class="keyword">if</span> (mapboxMap == <span class="keyword">null</span>) &#123;</div><div class="line">                initialiseMap();</div><div class="line">                mapboxMap.onStart();</div><div class="line">              &#125;</div><div class="line">            &#125;</div><div class="line">          &#125;);</div><div class="line"></div><div class="line">          <span class="keyword">super</span>.onSurfaceCreated(gl, config);</div><div class="line">        &#125;</div><div class="line">      &#125;;</div><div class="line">      addView(textureView, <span class="number">0</span>);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">      GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);</div><div class="line">      glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());</div><div class="line"></div><div class="line">      mapRenderer = <span class="keyword">new</span> GLSurfaceViewMapRenderer(getContext(), glSurfaceView) &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSurfaceCreated</span><span class="params">(GL10 gl, EGLConfig config)</span> </span>&#123;</div><div class="line">          MapView.<span class="keyword">this</span>.post(<span class="keyword">new</span> Runnable() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">              <span class="comment">// Initialise only once</span></div><div class="line">              <span class="keyword">if</span> (mapboxMap == <span class="keyword">null</span>) &#123;</div><div class="line">                initialiseMap();</div><div class="line">                mapboxMap.onStart();</div><div class="line">              &#125;</div><div class="line">            &#125;</div><div class="line">          &#125;);</div><div class="line"></div><div class="line">          <span class="keyword">super</span>.onSurfaceCreated(gl, config);</div><div class="line">        &#125;</div><div class="line">      &#125;;</div><div class="line"></div><div class="line">      glSurfaceView.setVisibility(View.VISIBLE);</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    nativeMapView = <span class="keyword">new</span> NativeMapView(<span class="keyword">this</span>, mapRenderer);</div><div class="line">    nativeMapView.resizeView(getMeasuredWidth(), getMeasuredHeight());</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们可以看出来，它首先根据选项区分使用TextureView作为view载体,还是GLSurfaceView作为view载体，然后分别讲TextureView和GLSurfaceView通过自定义的两个渲染器TextureViewMapRenderer和GLSurfaceViewMapRenderer的构造方法传递进去进行绑定．这里我们看GLSurfaceViewMapRenderer这个类．<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GLSurfaceViewMapRenderer</span> <span class="keyword">extends</span> <span class="title">MapRenderer</span> <span class="keyword">implements</span> <span class="title">GLSurfaceView</span>.<span class="title">Renderer</span> </span>&#123;</div><div class="line"></div><div class="line">  <span class="keyword">private</span> <span class="keyword">final</span> GLSurfaceView glSurfaceView;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="title">GLSurfaceViewMapRenderer</span><span class="params">(Context context, GLSurfaceView glSurfaceView)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>(context);</div><div class="line">    <span class="keyword">this</span>.glSurfaceView = glSurfaceView;</div><div class="line">    glSurfaceView.setEGLContextClientVersion(<span class="number">2</span>);</div><div class="line">    glSurfaceView.setEGLConfigChooser(<span class="keyword">new</span> EGLConfigChooser());</div><div class="line">    glSurfaceView.setRenderer(<span class="keyword">this</span>);</div><div class="line">    glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</div><div class="line">    glSurfaceView.onPause();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</div><div class="line">    glSurfaceView.onResume();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSurfaceCreated</span><span class="params">(GL10 gl, EGLConfig config)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onSurfaceCreated(gl, config);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSurfaceChanged</span><span class="params">(GL10 gl, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onSurfaceChanged(gl, width, height);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDrawFrame</span><span class="params">(GL10 gl)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onDrawFrame(gl);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="comment">/**</span></div><div class="line"><span class="comment">   * May be called from any thread.</span></div><div class="line"><span class="comment">   * &lt;p&gt;</span></div><div class="line"><span class="comment">   * Called from the renderer frontend to schedule a render.</span></div><div class="line"><span class="comment">   */</span></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">requestRender</span><span class="params">()</span> </span>&#123;</div><div class="line">    glSurfaceView.requestRender();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="comment">/**</span></div><div class="line"><span class="comment">   * May be called from any thread.</span></div><div class="line"><span class="comment">   * &lt;p&gt;</span></div><div class="line"><span class="comment">   * Schedules work to be performed on the MapRenderer thread.</span></div><div class="line"><span class="comment">   *</span></div><div class="line"><span class="comment">   * <span class="doctag">@param</span> runnable the runnable to execute</span></div><div class="line"><span class="comment">   */</span></div><div class="line">  <span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">queueEvent</span><span class="params">(Runnable runnable)</span> </span>&#123;</div><div class="line">    glSurfaceView.queueEvent(runnable);</div><div class="line">  &#125;&#125;</div></pre></td></tr></table></figure></p>
+<p>从这个源码我们可以看出来它并未做什么工作，只是在构造方法里做了一些基础配置，和绑定了GLSurfaceView.Renderer渲染器．其它都丢到TextureViewMapRenderer和GLSurfaceViewMapRenderer共同的父类MapRenderer里了，这里我们看下MapRenderer又做了什么<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@CallSuper</span></div><div class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onSurfaceCreated</span><span class="params">(GL10 gl, EGLConfig config)</span> </span>&#123;</div><div class="line">    nativeOnSurfaceCreated();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="meta">@CallSuper</span></div><div class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onSurfaceChanged</span><span class="params">(GL10 gl, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (width &lt; <span class="number">0</span>) &#123;</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"fbWidth cannot be negative."</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (height &lt; <span class="number">0</span>) &#123;</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"fbHeight cannot be negative."</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (width &gt; <span class="number">65535</span>) &#123;</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(</div><div class="line">        <span class="string">"fbWidth cannot be greater than 65535."</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (height &gt; <span class="number">65535</span>) &#123;</div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(</div><div class="line">        <span class="string">"fbHeight cannot be greater than 65535."</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    gl.glViewport(<span class="number">0</span>, <span class="number">0</span>, width, height);</div><div class="line">    nativeOnSurfaceChanged(width, height);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="meta">@CallSuper</span></div><div class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDrawFrame</span><span class="params">(GL10 gl)</span> </span>&#123;</div><div class="line">    nativeRender();</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (onFpsChangedListener != <span class="keyword">null</span>) &#123;</div><div class="line">      updateFps();</div><div class="line">    &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>我们看到MapRenderer也声明了onSurfaceCreated(),onSurfaceChanged(),onDrawFrame()方法，并加上＠CallSuper注解用于子类必须调用父类这三个方法，但是我们看到他们也并未做什么，而是分别调用了native<em>*</em>()将实现放入底层，这样性能会更好一些，一般onSurfaceCreated()是进行一些初始化配置的工作，onSurfaceChanged()执行画面有改变的时候，onDrawFrame()执行绘制的工作.这里我们跟踪onDrawFrame()内调用的nativeRender()方法</p>
+<p>这里我们看到与MapRenderer对应的实现底层文件map_renderer.cpp,这里我们看到它的registerNative()<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> MapRenderer::registerNative(jni::JNIEnv&amp; env) &#123;</div><div class="line">    <span class="comment">// Lookup the class</span></div><div class="line">    MapRenderer::javaClass = *jni::Class&lt;MapRenderer&gt;::Find(env).NewGlobalRef(env).release();</div><div class="line"></div><div class="line">#define METHOD(MethodPtr, name) jni::MakeNativePeerMethod&lt;decltype(MethodPtr), (MethodPtr)&gt;(name)</div><div class="line"></div><div class="line">    <span class="comment">// Register the peer</span></div><div class="line">    jni::RegisterNativePeer&lt;MapRenderer&gt;(env, MapRenderer::javaClass, <span class="string">"nativePtr"</span>,</div><div class="line">                                         std::make_unique&lt;MapRenderer, JNIEnv&amp;, jni::Object&lt;MapRenderer&gt;, jni::Object&lt;FileSource&gt;, jni::jfloat, jni::String&gt;,</div><div class="line">                                         <span class="string">"nativeInitialize"</span>, <span class="string">"finalize"</span>,</div><div class="line">                                         METHOD(&amp;MapRenderer::render, <span class="string">"nativeRender"</span>),</div><div class="line">                                         METHOD(&amp;MapRenderer::onSurfaceCreated,</div><div class="line">                                                <span class="string">"nativeOnSurfaceCreated"</span>),</div><div class="line">                                         METHOD(&amp;MapRenderer::onSurfaceChanged,</div><div class="line">                                                <span class="string">"nativeOnSurfaceChanged"</span>));</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到它将上层的nativeRender()方法和自己的render()方法进行绑定,我们接着看它的render()方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> MapRenderer::render(JNIEnv&amp;) &#123;</div><div class="line">    <span class="keyword">assert</span> (renderer);</div><div class="line"></div><div class="line">    std::shared_ptr&lt;UpdateParameters&gt; params;</div><div class="line">    &#123;</div><div class="line">        <span class="comment">// Lock on the parameters</span></div><div class="line">        std::unique_lock&lt;std::mutex&gt; lock(updateMutex);</div><div class="line">        <span class="keyword">if</span> (!updateParameters) <span class="keyword">return</span>;</div><div class="line"></div><div class="line">        <span class="comment">// Hold on to the update parameters during render</span></div><div class="line">        params = updateParameters;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// Activate the backend</span></div><div class="line">    BackendScope backendGuard &#123; *backend &#125;;</div><div class="line"></div><div class="line">    <span class="comment">// Ensure that the "current" scheduler on the render thread is</span></div><div class="line">    <span class="comment">// this scheduler.</span></div><div class="line">    Scheduler::SetCurrent(<span class="keyword">this</span>);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (framebufferSizeChanged) &#123;</div><div class="line">        backend-&gt;updateViewPort();</div><div class="line">        framebufferSizeChanged = <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    renderer-&gt;render(*params);</div><div class="line"></div><div class="line">    <span class="comment">// Deliver the snapshot if requested</span></div><div class="line">    <span class="keyword">if</span> (snapshotCallback) &#123;</div><div class="line">        snapshotCallback-&gt;operator()(backend-&gt;readFramebuffer());</div><div class="line">        snapshotCallback.reset();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到了这么一行代码renderer-&gt;render(*params);它将有关更新数据传入底层Renderer类中的render()方法，继续往下看<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> Renderer::render(<span class="keyword">const</span> UpdateParameters&amp; updateParameters) &#123;</div><div class="line">    impl-&gt;render(updateParameters);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里我们看到它将实现都放到它的Impl实现类，即renderer_impl文件里．这里我们看到render()方法中这行代码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">const</span> auto&amp; entry : renderSources) &#123;</div><div class="line">            <span class="keyword">if</span> (entry.second-&gt;isEnabled()) &#123;</div><div class="line">                entry.second-&gt;startRender(parameters);</div><div class="line">            &#125;</div><div class="line">        &#125;</div></pre></td></tr></table></figure></p>
+<p>这里通过RenderSource.startRender()方法开始渲染，其startRender()方法是虚函数，其子类RenderAnnotationSource，RenderGeoJSONSource，RenderRasterSource，RenderVectorSource，RenderImageSource分别继承并实现了它．</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/03/26/mapbox/Mapbox源码分析之样式加载/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          Mapbox源码分析之样式加载
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/22/android/android-Monkey压力测试/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">android-Monkey压力测试&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>
