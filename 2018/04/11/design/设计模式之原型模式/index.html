@@ -5,17 +5,19 @@
   
   <title>设计模式之原型模式 - koala&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="If you&apos;re prepared to adapt and learn,you can transform.">
+  <meta name="description" content="简介:原型模式是创建型设计模式之一，这是一个克隆原型产生实例的设计，主要用于解决复杂创建的对象或者构建耗时的对象。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="设计模式之原型模式">
 <meta property="og:url" content="http://yoursite.com/2018/04/11/design/设计模式之原型模式/index.html">
 <meta property="og:site_name" content="koala&#39;s Blog">
-<meta property="og:description" content="If you&apos;re prepared to adapt and learn,you can transform.">
+<meta property="og:description" content="简介:原型模式是创建型设计模式之一，这是一个克隆原型产生实例的设计，主要用于解决复杂创建的对象或者构建耗时的对象。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-04-11T13:05:55.737Z">
+<meta property="og:image" content="http://yoursite.com/images/design_clone.png">
+<meta property="og:updated_time" content="2018-04-11T14:44:49.493Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="设计模式之原型模式">
-<meta name="twitter:description" content="If you&apos;re prepared to adapt and learn,you can transform.">
+<meta name="twitter:description" content="简介:原型模式是创建型设计模式之一，这是一个克隆原型产生实例的设计，主要用于解决复杂创建的对象或者构建耗时的对象。">
+<meta name="twitter:image" content="http://yoursite.com/images/design_clone.png">
   
   
     <link rel="icon" href="/favicon.png">
@@ -76,11 +78,21 @@
   <time datetime="2018-04-11T13:05:07.000Z" itemprop="datePublished">2018-04-11</time>
 </a>
       
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/design/">design</a>
+  </div>
+
       
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>原型模式是创建型设计模式之一，这是一个克隆原型产生实例的设计，主要用于解决复杂创建的对象或者构建耗时的对象。<br><a id="more"></a> </p>
+<h4 id="UML类图"><a href="#UML类图" class="headerlink" title="UML类图"></a>UML类图</h4><p><img src="/images/design_clone.png" alt=""><br>从UML图中我们可以看到，原型模式的实现其实很简单，主要是将所需要实现原型模式的对象去实现Cloneable接口，然后去重写它的clone()方法</p>
+<h4 id="案例讲解"><a href="#案例讲解" class="headerlink" title="案例讲解"></a>案例讲解</h4><p>同样，我们以Retrofit框架为例，讲解一下别人是如何使用这个设计模式的，那么我们看到Call<t>这个接口<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Call</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">Cloneable</span> </span>&#123;</div><div class="line"></div><div class="line">  <span class="function">Response&lt;T&gt; <span class="title">execute</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">void</span> <span class="title">enqueue</span><span class="params">(Callback&lt;T&gt; callback)</span></span>;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">boolean</span> <span class="title">isExecuted</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">void</span> <span class="title">cancel</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">boolean</span> <span class="title">isCanceled</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">  <span class="function">Call&lt;T&gt; <span class="title">clone</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">  <span class="function">Request <span class="title">request</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></t></p>
+<p>我们看到这个Call<t>接口实现了Cloneable,那么实现它的原型有 OkHttpCall<t> 和 ExecutorCallbackCall<t>,然后我们通过他们的源码发现，他们并没有调用super.clone()<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"CloneDoesntCallSuperClone"</span>) <span class="comment">// We are a final type &amp; this saves clearing state.</span></div><div class="line"> <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> OkHttpCall&lt;T&gt; <span class="title">clone</span><span class="params">()</span> </span>&#123;</div><div class="line">   <span class="keyword">return</span> <span class="keyword">new</span> OkHttpCall&lt;&gt;(serviceMethod, args);</div><div class="line"> &#125;</div></pre></td></tr></table></figure></t></t></t></p>
+<p>这是OkHttpCall<t>实现的clone,是不是发现这所谓的原型模式，怎么不对，怎么变成new一个对象，那么我们为啥还使用clone方法去获取一个对象呢，直接new一个不就行了吗，这里我们看到它用SuppressWarnings注解对警告进行了忽略，然后我们看下它的注释，原来这是保存了这个类的最终状态，避免其它调用者进行修改而做的保护性拷贝，我们再看看另一个<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"CloneDoesntCallSuperClone"</span>) <span class="comment">// Performing deep clone.</span></div><div class="line">    <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Call&lt;T&gt; <span class="title">clone</span><span class="params">()</span> </span>&#123;</div><div class="line">      <span class="keyword">return</span> <span class="keyword">new</span> ExecutorCallbackCall&lt;&gt;(callbackExecutor, delegate.clone());</div><div class="line">    &#125;</div></pre></td></tr></table></figure></t></p>
+<p>   这里同样是通过new构建的一个对象，注解表示它进行了一个深拷贝，什么是深拷贝呢？<br>我们看到这个OkHttpCall将serviceMethod和args传入进去，这两个都是对象类型，那么这两个值一旦发生变化，相应的原型内的值也会发生变化,因此这种拷贝叫浅拷贝，如果是深拷贝呢，那么副本修改过的则不会影响到原型的值。<br>那么我们这里看到传入的两个参数都是接口，而有可能发生改变的则是Call<t>回调接口，使用这里用了delegate.clone()来保证新创建的ExecutorCallbackCall不会影响到其它ExecutorCallbackCall。</t></p>
+
       
     </div>
     
