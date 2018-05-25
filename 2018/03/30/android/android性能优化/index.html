@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="koala&#39;s Blog">
 <meta property="og:description" content="简介:这里简单介绍下android性能优化的一些方法">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-04-07T14:31:51.855Z">
+<meta property="og:updated_time" content="2018-05-23T14:41:07.955Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="android性能优化">
 <meta name="twitter:description" content="简介:这里简单介绍下android性能优化的一些方法">
@@ -85,32 +85,42 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>这里简单介绍下android性能优化的一些方法<br><a id="more"></a> </p>
-<ol>
-<li><p>用静态工厂方法代替构造方法<br>class Product{<br>public static Product getInstance(){ return new Product();}<br>}<br>静态工厂方法可以有具体的名称<br>静态方法不一定返回新的对象，可以返回已存在的对象<br>静态方法不一定返回当前类的对象，也可以返回当前类的子类对象</p>
-</li>
-<li><p>避免创建重复的对象<br>使用StringBuilder连接代替+<br>使用单例模式提供常用对象</p>
-</li>
-<li><p>防止内存泄露</p>
-</li>
-<li><p>返回零长度的集合而不是null<br>如果方法的返回类型是一个集合，在没有数据的情况下返回0长度的集合，这样处理方法返回值时不用处理null值，避免空指针异常。</p>
-</li>
-<li><p>通过接口引用对象<br>List<string> list = new ArrayList<string>;<br>这样换一种实现只需要使用新的实现该接口的类创建对象即可。</string></string></p>
-</li>
-<li><p>避免ANR<br>避免在主线程处理耗时过长的任务，使用线程，Handler,AnsyTask, 等都可以。</p>
-</li>
-<li><p>执行时间测试<br>通过System.currentTimeMillis()获取时间进行计算</p>
-</li>
-<li><p>内存消耗测试<br>public class Memory{</p>
-<pre><code>public static long used(){
-       long total = Runtime.getRuntime().totalMemory();
-       long free = Runtime.getRuntime().freeMemory();
-       return (total - free);
-}
-</code></pre><p>}<br>通过调用used()方法测出消耗内存数</p>
-</li>
-<li><p>性能测试工具 traceview<br>通过调用Debug.startMethodTracing(“文件名”)；<br>Debug.stopMethodTracing();<br>traceview 文件路径   查看文件。</p>
-</li>
-</ol>
+<h4 id="布局优化"><a href="#布局优化" class="headerlink" title="布局优化"></a>布局优化</h4><ul>
+<li>在布局中尽可能减少嵌套，因为嵌套相当于增加了布局的层级，增加了绘制的开销。</li>
+<li>在相同的布局中使用<inclede>标签，可以重用布局</inclede></li>
+<li>如果被<include>标签包含的布局和父布局是一样的，那么可以使用<merge>标签用来减少布局的层级</merge></include></li>
+<li>在初始化的时候可以使用ViewStub来按需加载布局</li>
+<li>通过设备的开发者模式打开布局开关可以看到布局渲染重叠的程度</li>
+</ul>
+<h4 id="绘制优化"><a href="#绘制优化" class="headerlink" title="绘制优化"></a>绘制优化</h4><ul>
+<li>onDraw()方法不要创建新的局部对象，因为onDraw()方法可能频繁调用，导致产生大量临时对象占用内存</li>
+<li>onDraw()方法不要做耗时操作，保证view的绘制过程不超过16ms</li>
+</ul>
+<h4 id="内存优化"><a href="#内存优化" class="headerlink" title="内存优化"></a>内存优化</h4><ul>
+<li>不要使用静态变量持有context,会导致Activity无法释放</li>
+<li>单例模式注意不要持有context,会导致Activity无法释放</li>
+<li>频繁做字符串操作时，使用StringBuilder或StringBuffer代替String,因为String会不停生成对象占据空间</li>
+<li>属性动画需要注意停止动画，否则view会一直被动画持有，而view又持有Activity导致无法释放</li>
+<li>使用数据库操作时注意游标cursor需要及时关闭</li>
+<li>操作文件数据时输入输出流InputStream/OutputStream记得关闭</li>
+<li>Bitmap使用后需要调用recycle()释放图片资源</li>
+<li>大图片使用BitmapFactory.Option对图片进行采样压缩</li>
+<li>adapter使用缓存contentview来减少对象创建</li>
+<li>使用观察者模式注册对象时需要注意取消注册</li>
+<li>适当使用软引用和弱引用</li>
+<li>使用线程池来复用线程</li>
+</ul>
+<h4 id="响应优化"><a href="#响应优化" class="headerlink" title="响应优化"></a>响应优化</h4><ul>
+<li>在主线程进行耗时操作时会触发ANR，Activity为5秒，BroadcastReceiver为10秒，避免在主线程处理耗时过长的任务，使用Thead，Handler,AnsyTask等都可以。</li>
+</ul>
+<h4 id="时间消耗测试"><a href="#时间消耗测试" class="headerlink" title="时间消耗测试"></a>时间消耗测试</h4><p>通过System.currentTimeMillis()获取时间进行计算</p>
+<h4 id="内存消耗测试"><a href="#内存消耗测试" class="headerlink" title="内存消耗测试"></a>内存消耗测试</h4><p>public class Memory{<br>        public static long used(){<br>               long total = Runtime.getRuntime().totalMemory();<br>               long free = Runtime.getRuntime().freeMemory();<br>               return (total - free);<br>        }<br>}<br>在程序片段之间通过调用used()方法测出消耗内存数</p>
+<h4 id="使用工具"><a href="#使用工具" class="headerlink" title="使用工具"></a>使用工具</h4><ul>
+<li>Hierarchy Viewer<br>用来观察布局的层级</li>
+<li>TraceView<br>分析方法调用栈以及其执行时间, 优化方法执行</li>
+<li>Memory Monitor<br>用来做内存分析</li>
+<li>Square的leakcanary<br>第三方用来检测内存泄漏的库</li>
+</ul>
 
       
     </div>

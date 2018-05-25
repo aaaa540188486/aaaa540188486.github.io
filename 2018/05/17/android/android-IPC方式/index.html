@@ -3,22 +3,19 @@
 <head>
   <meta charset="utf-8">
   
-  <title>android 项目构建流程 - koala&#39;s Blog</title>
+  <title>android IPC方式 - koala&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="简介:Android 工程通过编译以及打包,打包成 .apk 文件（.dex files，resource.arsc,uncompiled resources，AndroidManifest.xml）然后 签名 最后通过 ADB 链接到设备或虚拟机。">
+  <meta name="description" content="简介:IPC 是Inter-Process Communication的缩写，含义是跨进程通信，这里我们讲讲android的跨进程通信方式。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="android 项目构建流程">
-<meta property="og:url" content="http://yoursite.com/2018/03/08/android项目构建流程/index.html">
+<meta property="og:title" content="android IPC方式">
+<meta property="og:url" content="http://yoursite.com/2018/05/17/android/android-IPC方式/index.html">
 <meta property="og:site_name" content="koala&#39;s Blog">
-<meta property="og:description" content="简介:Android 工程通过编译以及打包,打包成 .apk 文件（.dex files，resource.arsc,uncompiled resources，AndroidManifest.xml）然后 签名 最后通过 ADB 链接到设备或虚拟机。">
+<meta property="og:description" content="简介:IPC 是Inter-Process Communication的缩写，含义是跨进程通信，这里我们讲讲android的跨进程通信方式。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://yoursite.com/images/project_build.png">
-<meta property="og:image" content="http://yoursite.com/images/project_build2.png">
-<meta property="og:updated_time" content="2018-03-09T02:07:30.352Z">
+<meta property="og:updated_time" content="2018-05-17T12:49:53.644Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="android 项目构建流程">
-<meta name="twitter:description" content="简介:Android 工程通过编译以及打包,打包成 .apk 文件（.dex files，resource.arsc,uncompiled resources，AndroidManifest.xml）然后 签名 最后通过 ADB 链接到设备或虚拟机。">
-<meta name="twitter:image" content="http://yoursite.com/images/project_build.png">
+<meta name="twitter:title" content="android IPC方式">
+<meta name="twitter:description" content="简介:IPC 是Inter-Process Communication的缩写，含义是跨进程通信，这里我们讲讲android的跨进程通信方式。">
   
   
     <link rel="icon" href="/favicon.png">
@@ -60,7 +57,7 @@
     </div>
   </div>
 </header>
-    <section id="main" class="outer"><article id="post-android项目构建流程" class="article article-type-post" itemscope itemprop="blogPost">
+    <section id="main" class="outer"><article id="post-android/android-IPC方式" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
     
@@ -68,15 +65,15 @@
         
   
     <h1 class="article-title" itemprop="name">
-      android 项目构建流程
+      android IPC方式
     </h1>
   
 
       </header>
     
     <div class="article-meta">
-      <a href="/2018/03/08/android项目构建流程/" class="article-date">
-  <time datetime="2018-03-08T01:52:14.000Z" itemprop="datePublished">2018-03-08</time>
+      <a href="/2018/05/17/android/android-IPC方式/" class="article-date">
+  <time datetime="2018-05-17T12:11:48.000Z" itemprop="datePublished">2018-05-17</time>
 </a>
       
   <div class="article-category">
@@ -87,8 +84,23 @@
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>Android 工程通过编译以及打包,打包成 .apk 文件（.dex files，resource.arsc,uncompiled resources，AndroidManifest.xml）然后 签名 最后通过 ADB 链接到设备或虚拟机。<br><a id="more"></a><br><img src="/images/project_build.png" alt=""><br><img src="/images/project_build2.png" alt=""></p>
-<h4 id="构建过程"><a href="#构建过程" class="headerlink" title="构建过程"></a>构建过程</h4><p>1、把源代码编译进DEX(Dalvik Executable)文件，包括Android设备上运行的字节码文件和其它编译资源<br>2、apk安装包包括DEX文件和其它资源文件，在安装包运行在Android设备之前必须被签名<br>3、apk安装包签名使用调试或者发布keystore，如果你只想进行测试和分析，需要使用debug kenstore,android studio自动为新项目配置debug kenstore<br>4、在生成最终apk之前，会使用zipalign工具使你的app在设备上运行时使用更少内存。<br>构建过程结束你会有debug ask和release apk,去部署，测试或发布给用户。</p>
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>IPC 是Inter-Process Communication的缩写，含义是跨进程通信，这里我们讲讲android的跨进程通信方式。<br><a id="more"></a> </p>
+<h4 id="多进程模式"><a href="#多进程模式" class="headerlink" title="多进程模式"></a>多进程模式</h4><p>在android中，我们可以通过在清单文件中指定组件 android:process 属性来设置组件运行的进程，如果以“:”开头指定进程，则该进程属于该应用的私有进程，否则属于全局进程</p>
+<h4 id="多进程的问题"><a href="#多进程的问题" class="headerlink" title="多进程的问题"></a>多进程的问题</h4><p>android 会为每个进程分配一个虚拟机，这导致不同虚拟机访问同一个类对象会造成多个副本，因此会引出这些问题</p>
+<ul>
+<li>静态成员和单例模式失效</li>
+<li>线程同步机制失效</li>
+<li>SharedPreferences可靠性下降</li>
+<li>Application 多次创建</li>
+</ul>
+<h4 id="进程通信方式"><a href="#进程通信方式" class="headerlink" title="进程通信方式"></a>进程通信方式</h4><ol>
+<li>使用Bundle，通过intent进行通信</li>
+<li>共享文件</li>
+<li>通过Handler，使用Message进行通信</li>
+<li>使用AIDL</li>
+<li>使用ContentProvider</li>
+<li>使用socket</li>
+</ol>
 
       
     </div>
@@ -103,17 +115,9 @@
     
 <nav id="article-nav">
   
-    <a href="/2018/03/08/android安全机制/" id="article-nav-newer" class="article-nav-link-wrap">
-      <div class="article-nav-title"><span>&lt;</span>&nbsp;
-        
-          android安全机制
-        
-      </div>
-    </a>
   
-  
-    <a href="/2018/03/06/android事件分发机制/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">android事件分发机制&nbsp;<span>&gt;</span></div>
+    <a href="/2018/05/15/data_structure/数据结构之树与二叉树/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">数据结构之树&nbsp;<span>&gt;</span></div>
     </a>
   
 </nav>

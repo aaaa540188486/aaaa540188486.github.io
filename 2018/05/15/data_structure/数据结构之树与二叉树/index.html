@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>数据结构之树 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:树形结构是非线性结构，可以表达数据之间一对多的关系，这里说下树以及二叉树结构。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构之树">
+<meta property="og:url" content="http://yoursite.com/2018/05/15/data_structure/数据结构之树与二叉树/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:树形结构是非线性结构，可以表达数据之间一对多的关系，这里说下树以及二叉树结构。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-05-16T13:40:20.925Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="数据结构之树">
+<meta name="twitter:description" content="简介:树形结构是非线性结构，可以表达数据之间一对多的关系，这里说下树以及二叉树结构。">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-data_structure/数据结构之树与二叉树" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      数据结构之树
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/05/15/data_structure/数据结构之树与二叉树/" class="article-date">
+  <time datetime="2018-05-14T16:22:19.000Z" itemprop="datePublished">2018-05-15</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>树形结构是非线性结构，可以表达数据之间一对多的关系，这里说下树以及二叉树结构。<br><a id="more"></a> </p>
+<h4 id="树的定义"><a href="#树的定义" class="headerlink" title="树的定义"></a>树的定义</h4><p>树是由N个节点组成的有限集合，如果n=0，则它是一个空树。如果n&gt;0,这n个节点仅存在一个节点作为树的节点，其它节点可分成若干个子集代表子树。它的特点是每一个节点可以有零个或多个后继节点，但有且只有一个前驱节点。</p>
+<h4 id="树的性质"><a href="#树的性质" class="headerlink" title="树的性质"></a>树的性质</h4><ul>
+<li>树的节点数等于所有节点的度数+1</li>
+<li>度为m的树中第i层至多有m的（i-1）个平方的节点（i&gt;=1）</li>
+<li>高度为h的m次树最多有m-1分之m的（h-1）个平方的节点</li>
+<li>具有n个节点的m次树的最小高度为大于等于log m (n(m-1)+1)的值的最小整数</li>
+</ul>
+<h4 id="树的运算"><a href="#树的运算" class="headerlink" title="树的运算"></a>树的运算</h4><p>树的遍历过程有三种方式，先根遍历，后根遍历以及层次遍历</p>
+<ol>
+<li>先根遍历：访问根节点，然后按照从左至右的顺序遍历子树</li>
+<li>后跟遍历：先按照从左至右的顺序遍历子树，再访问根节点</li>
+<li>层次遍历：从根节点开始，从上到下，从左到右遍历树</li>
+</ol>
+<h4 id="树的存储结构"><a href="#树的存储结构" class="headerlink" title="树的存储结构"></a>树的存储结构</h4><p>树的存储结构不同，也会影响其运算</p>
+<ol>
+<li>双亲存储结构<br>typedef struct<br>{ ElemType data; //存放节点的值<br>int parent;    //存放双亲的位置<br>} PTree[MaxSize];<br>在这个存储结构中，求某个节点的根节点很容易，但是求孩子节点时，则需要遍历整个结构</li>
+<li>孩子链存储结构<br>typedef struct node<br>{<br> ElemType data; //节点的值<br> struct node * sons[MaxSons]; 指向孩子节点<br>} TSonNode;<br>在这个存储结构中找到某个节点的子节点很容易，找双亲节点则比较费时，MaxSon为树的度，如果树的度较大，会存在较多的空指针域</li>
+<li>孩子兄弟链存储结构<br>typedef struct tnode<br>{<br> ElemType data; //节点的值<br> struct tnode <em> hp; //指向兄弟<br> struct tnode </em> vp; //指向孩子节点<br>}TSBNode;<br>该结构的优点是比较容易将树转换成二叉树，但同样找双亲节点比较麻烦</li>
+</ol>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/17/android/android-IPC方式/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          android IPC方式
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/08/android/android-版本概要/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">android 版本概要&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

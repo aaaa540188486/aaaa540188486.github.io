@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>android文件系统与数据存储 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:这篇主要来讲下android的文件系统以及数据存储的几种方式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android文件系统与数据存储">
+<meta property="og:url" content="http://yoursite.com/2018/05/08/android/android文件系统与数据存储/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:这篇主要来讲下android的文件系统以及数据存储的几种方式">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-05-14T16:17:01.873Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="android文件系统与数据存储">
+<meta name="twitter:description" content="简介:这篇主要来讲下android的文件系统以及数据存储的几种方式">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-android/android文件系统与数据存储" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      android文件系统与数据存储
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/05/08/android/android文件系统与数据存储/" class="article-date">
+  <time datetime="2018-05-08T01:25:10.000Z" itemprop="datePublished">2018-05-08</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/android/">android</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>这篇主要来讲下android的文件系统以及数据存储的几种方式<br><a id="more"></a> </p>
+<h4 id="Android的文件系统"><a href="#Android的文件系统" class="headerlink" title="Android的文件系统"></a>Android的文件系统</h4><p>我们知道，android是基于linux内核上开发的一套移动端操作系统，那么它自身的文件系统其实也是linux的文件系统，我们通过SDK提供adb工具使用命令查看下android系统的文件目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">adb shell ls -l</div></pre></td></tr></table></figure></p>
+<p>我们仍然可以看到一些linux熟悉的目录，像bin,dev,etc,mnt,root,sbin,sys,var等这些目录，这里我们发现好像少了一个重要的目录，即home目录，在linux中home目录用来存放不同用户的文件数据，各用户数据之间是不可访问的，那么在android中又是做了什么样的改变呢？<br>android会为每个应用创建一个linux账号，每个应用通过自己的账号去访问自己应用数据目录下的文件从而保证数据的私有化，android的第三方应用和数据都存放在data目录下，在data/data/目录下创建一个安装包的包名同名的应用数据目录，用来存放数据，所以linux的home目录在android中是以data/data目录呈现的，而不同的用户则是以不同的应用来表示．</p>
+<h4 id="Android的数据存储"><a href="#Android的数据存储" class="headerlink" title="Android的数据存储"></a>Android的数据存储</h4><p>android的数据存储主要有文件存储，设置文件，数据库以及云存储等几种存储方式．</p>
+<ol>
+<li><p>文件存储<br>android的文件存储一般是存储在扩展存储器上，也就是我们说的SD卡，但是现在很多手机已经不支持可插拔式的SD卡，而是有一个内部存储设备来提供数据储存，不过在一些平板上仍然是除了内部存储之外还提供一个可插拔SD卡的接口，来提供数据的存储以及迁移．文件通常是存储在android系统的sdcard目录下，而mnt,则是记录android挂载的外部存储信息，比如说mnt/sdcard,这其实是一个短链接指向的sdcard目录，而sdcard目录也是短链，通常指向storage目录下的文件</p>
+</li>
+<li><p>设置文件<br>我们也可以使用设置文件来进行存储数据，Android开发中，通常通过SharedPreferences类提供的数据读取接口用来存储和读取数据，.设置文件通常存储在data/data/应用包名/shared_prefs目录下，默认的设置文件名为：应用包名_preferences.xml，设置文件的加载和写入都是线程安全的，但不是进程安全的，这点需要注意一下，避免在不同进程中同时操作一份设置文件。</p>
+</li>
+<li><p>数据库储存<br>我们也可以为应用创建一个自身的数据库用于存储数据，android的数据库是使用的 <a href="http://www.sqlite.org" target="_blank" rel="external">SQLite</a>关系型数据库，同样，数据库存放的地址是应用数据目录下的database子目录下，即 data/data/应用包名/databases下，我们也可以在扩展存储卡中创建数据库，达到数据共享的目的，在实践中要注意的是保持同时访问的数据库SqliteDatabase对象为一个，来控制并发访问数据库的安全性，也可以通过SDK下的工具加载数据库并操作数据库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">adb shell </div><div class="line">sqlite3 data/data/应用包名/databases/xx.db</div></pre></td></tr></table></figure>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/08/android/android-版本概要/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          android 版本概要
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/04/24/open/skia图形引擎库构建/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">skia图形引擎库构建&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

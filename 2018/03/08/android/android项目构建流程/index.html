@@ -14,7 +14,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/images/project_build.png">
 <meta property="og:image" content="http://yoursite.com/images/project_build2.png">
-<meta property="og:updated_time" content="2018-04-07T14:31:51.855Z">
+<meta property="og:updated_time" content="2018-05-23T13:42:49.590Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="android 项目构建流程">
 <meta name="twitter:description" content="简介:Android 工程通过编译以及打包,打包成 .apk 文件（.dex files，resource.arsc,uncompiled resources，AndroidManifest.xml）然后 签名 最后通过 ADB 链接到设备或虚拟机。">
@@ -88,7 +88,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>Android 工程通过编译以及打包,打包成 .apk 文件（.dex files，resource.arsc,uncompiled resources，AndroidManifest.xml）然后 签名 最后通过 ADB 链接到设备或虚拟机。<br><a id="more"></a><br><img src="/images/project_build.png" alt=""><br><img src="/images/project_build2.png" alt=""></p>
-<h4 id="构建过程"><a href="#构建过程" class="headerlink" title="构建过程"></a>构建过程</h4><p>1、把源代码编译进DEX(Dalvik Executable)文件，包括Android设备上运行的字节码文件和其它编译资源<br>2、apk安装包包括DEX文件和其它资源文件，在安装包运行在Android设备之前必须被签名<br>3、apk安装包签名使用调试或者发布keystore，如果你只想进行测试和分析，需要使用debug kenstore,android studio自动为新项目配置debug kenstore<br>4、在生成最终apk之前，会使用zipalign工具使你的app在设备上运行时使用更少内存。<br>构建过程结束你会有debug ask和release apk,去部署，测试或发布给用户。</p>
+<h4 id="构建过程"><a href="#构建过程" class="headerlink" title="构建过程"></a>构建过程</h4><p>1、利用SDK的aapt工具，对应用资源目录结构和资源文件内容解析，编译生成R类和App._ap文件<br>2、通过java编译器通过javac将R类，源文件类和其它jar包编译生成class文件<br>3、通过SDK的dx工具，将所有class文件编译成dex文件<br>4、通过SDK的apkbuilder工具将dex文件，资源文件，配置文件打包生成.apk格式的应用安装包，在打包过程中，App._ap文件会被进一步压缩，得到体积更小的resoures.arsc文件<br>5、apk安装包包括DEX文件和其它资源文件，在安装包运行在Android设备之前必须被签名<br>6、apk安装包签名使用调试或者发布keystore，如果你只想进行测试和分析，需要使用debug kenstore,android studio自动为新项目配置debug kenstore<br>7、在生成最终apk之前，会使用zipalign工具使你的app在设备上运行时使用更少内存。<br>构建过程结束你会有debug ask和release apk,去部署，测试或发布给用户。</p>
 
       
     </div>

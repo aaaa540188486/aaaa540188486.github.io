@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>skia图形引擎库构建 - koala&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介:Skia是一个开源的２Ｄ图形库，被用于Google Chrome和Chrome OS，Android，Mozilla Firefox和Firefox OS等多个产品的图形引擎官网:https://skia.org/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="skia图形引擎库构建">
+<meta property="og:url" content="http://yoursite.com/2018/04/24/open/skia图形引擎库构建/index.html">
+<meta property="og:site_name" content="koala&#39;s Blog">
+<meta property="og:description" content="简介:Skia是一个开源的２Ｄ图形库，被用于Google Chrome和Chrome OS，Android，Mozilla Firefox和Firefox OS等多个产品的图形引擎官网:https://skia.org/">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-05-14T16:17:01.873Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="skia图形引擎库构建">
+<meta name="twitter:description" content="简介:Skia是一个开源的２Ｄ图形库，被用于Google Chrome和Chrome OS，Android，Mozilla Firefox和Firefox OS等多个产品的图形引擎官网:https://skia.org/">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/webfonts/ptserif/main.css">
+  <link rel="stylesheet" href="/webfonts/ptserif/source-code-pro.css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo logo-text" href="/">Koala</a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/atom.xml">Rss</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-open/skia图形引擎库构建" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      skia图形引擎库构建
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2018/04/24/open/skia图形引擎库构建/" class="article-date">
+  <time datetime="2018-04-24T01:11:15.000Z" itemprop="datePublished">2018-04-24</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/open/">open</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>Skia是一个开源的２Ｄ图形库，被用于Google Chrome和Chrome OS，Android，Mozilla Firefox和Firefox OS等多个产品的图形引擎<br>官网:<a href="https://skia.org/" target="_blank" rel="external">https://skia.org/</a><br><a id="more"></a> </p>
+<h3 id="下载："><a href="#下载：" class="headerlink" title="下载："></a>下载：</h3><ol>
+<li>下载depot_tools并配置环境<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git clone <span class="string">'https://chromium.googlesource.com/chromium/tools/depot_tools.git'</span></div><div class="line">export PATH=<span class="string">"$&#123;PWD&#125;/depot_tools:$&#123;PATH&#125;"</span></div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>这里经常因为网络或者墙的问题clone不下来，大家可以手动下载zip包并配置环境</p>
+<ol>
+<li>下载skia<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">git clone https:<span class="comment">//skia.googlesource.com/skia.git</span></div><div class="line">cd skia</div><div class="line">python tools/git-sync-deps</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>skia是通过这里通过<a href="https://chromium.googlesource.com/chromium/src/tools/gn/" target="_blank" rel="external">GN</a>来构建工程的，<br>使用python tools/git-sync-deps有时候会失效，这里还可以通过bin目录下的fetch-gn脚本来配置gn环境</p>
+<h3 id="构建"><a href="#构建" class="headerlink" title="构建"></a>构建</h3><p>skia提供了一些参数可以进行构建的配置，通过下面这个命令可以看到可使用的一些参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/gn args out/Debug --list</div></pre></td></tr></table></figure></p>
+<p>skia可以通过参数来构建多个特性的文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">bin/gn gen out/Static --args=&apos;is_official_build=true&apos;</div><div class="line">bin/gn gen out/Shared --args=&apos;is_official_build=true is_component_build=true&apos;</div><div class="line">bin/gn gen out/Debug</div><div class="line">bin/gn gen out/Release  --args=&apos;is_debug=false&apos;</div><div class="line">bin/gn gen out/Clang    --args=&apos;cc=&quot;clang&quot; cxx=&quot;clang++&quot;&apos;</div><div class="line">bin/gn gen out/Cached   --args=&apos;cc_wrapper=&quot;ccache&quot;&apos;</div><div class="line">bin/gn gen out/RTTI     --args=&apos;extra_cflags_cc=[&quot;-frtti&quot;]&apos;</div></pre></td></tr></table></figure></p>
+<p>使用Ninja命令来编译和链接skia生成动态库<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">ninja -C out/Static</div><div class="line">ninja -C out/Shared</div><div class="line">ninja -C out/Debug</div><div class="line">ninja -C out/Release</div><div class="line">ninja -C out/Clang</div><div class="line">ninja -C out/Cached</div><div class="line">ninja -C out/RTTI</div></pre></td></tr></table></figure></p>
+<p>如果一些头文件缺失，可以通过下面的脚本来安装一些依赖，这里可以打开脚本看看，这里只支持了Ubuntu|Debian这些系统，我这里使用的fedora,因此执行脚本时会提示’unknown system’<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tools/install_dependencies.sh</div></pre></td></tr></table></figure></p>
+<p>在编译生成过程中，往往会碰到下面这个错误<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ninja: error: &apos;../../third_party/externals/jsoncpp/src/lib_json/json_reader.cpp&apos;, needed by &apos;obj/third_party/externals/jsoncpp/src/lib_json/jsoncpp.json_reader.o&apos;, missing and no known rule to make it</div></pre></td></tr></table></figure></p>
+<p>这是因为skia使用很多第三方库来提供多种功能，可以通过设置skia_use_xxx来启用或关闭这些功能，或者你也可以在github上找到这些第三方库代码放置third_party/externals目录下，但是这里得注意第三方库的版本问题．如果启用skia_use_xxx,则启用skia_use_system_xxx时会在系统路径下去找这些头文件和库，如果设置了is_official_build=true，则默认配置了所有skia_use_system_xxx默认值，你也可以通过extra_cflags和extra_ldflags来添加库路径．</p>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/08/android/android文件系统与数据存储/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          android文件系统与数据存储
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/04/11/design/设计模式之原型模式/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">设计模式之原型模式&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+<div class="share_addthis">
+  <div class="sharing addthis_toolbox share">
+    <a class="addthis_button_facebook_like"></a>
+    <a class="addthis_button_tweet"></a>
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-560c64c35486b3d4" async="async"></script>
+</div>
+
+
+
+
+<section id="comments">
+  <!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zNDYxOS8xMTE1Nw==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+</section>
+ </section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Koala&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+  </div>
+</body>
+</html>

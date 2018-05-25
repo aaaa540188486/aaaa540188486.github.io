@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   
-  <title>android NDK开发之Cmake构建原生库 - koala&#39;s Blog</title>
+  <title>android NDK开发 - koala&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="简介:android NDK开发有通过外部的构建工具将原生代码构建成库文件，也有用开发工具自身带的，android studio支持CMake和ndk-build来构建原生库，这里我们介绍通过CMake来构建原生代码。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="android NDK开发之Cmake构建原生库">
-<meta property="og:url" content="http://yoursite.com/2018/03/12/android/android-NDK开发之Cmake构建原生库/index.html">
+<meta property="og:title" content="android NDK开发">
+<meta property="og:url" content="http://yoursite.com/2018/03/12/android/android-NDK开发/index.html">
 <meta property="og:site_name" content="koala&#39;s Blog">
 <meta property="og:description" content="简介:android NDK开发有通过外部的构建工具将原生代码构建成库文件，也有用开发工具自身带的，android studio支持CMake和ndk-build来构建原生库，这里我们介绍通过CMake来构建原生代码。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/images/ndk-install.png">
-<meta property="og:updated_time" content="2018-04-07T14:31:51.854Z">
+<meta property="og:updated_time" content="2018-05-23T15:25:55.607Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="android NDK开发之Cmake构建原生库">
+<meta name="twitter:title" content="android NDK开发">
 <meta name="twitter:description" content="简介:android NDK开发有通过外部的构建工具将原生代码构建成库文件，也有用开发工具自身带的，android studio支持CMake和ndk-build来构建原生库，这里我们介绍通过CMake来构建原生代码。">
 <meta name="twitter:image" content="http://yoursite.com/images/ndk-install.png">
   
@@ -59,7 +59,7 @@
     </div>
   </div>
 </header>
-    <section id="main" class="outer"><article id="post-android/android-NDK开发之Cmake构建原生库" class="article article-type-post" itemscope itemprop="blogPost">
+    <section id="main" class="outer"><article id="post-android/android-NDK开发" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
     
@@ -67,14 +67,14 @@
         
   
     <h1 class="article-title" itemprop="name">
-      android NDK开发之Cmake构建原生库
+      android NDK开发
     </h1>
   
 
       </header>
     
     <div class="article-meta">
-      <a href="/2018/03/12/android/android-NDK开发之Cmake构建原生库/" class="article-date">
+      <a href="/2018/03/12/android/android-NDK开发/" class="article-date">
   <time datetime="2018-03-12T08:07:02.000Z" itemprop="datePublished">2018-03-12</time>
 </a>
       
@@ -87,6 +87,12 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h3 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h3><p>android NDK开发有通过外部的构建工具将原生代码构建成库文件，也有用开发工具自身带的，android studio支持CMake和ndk-build来构建原生库，这里我们介绍通过CMake来构建原生代码。<br><a id="more"></a> </p>
+<h4 id="JNI和NDK"><a href="#JNI和NDK" class="headerlink" title="JNI和NDK"></a>JNI和NDK</h4><p>JNI全称是java native interface,即java原生代码接口，其作用就是连接底层代码c/c++和java之间的交互．<br>NDK全称是Native Development Kit，即原生开发的工具包，里面包含着快速开发的动态库，以及相关构建工具等</p>
+<h4 id="为什么使用JNI"><a href="#为什么使用JNI" class="headerlink" title="为什么使用JNI"></a>为什么使用JNI</h4><ol>
+<li>支持跨平台，用c/c++编译的so库可以在其它平台上很好移植，复用度高</li>
+<li>提高性能效率</li>
+<li>代码安全性高，反编译难度大</li>
+</ol>
 <h4 id="下载安装工具"><a href="#下载安装工具" class="headerlink" title="下载安装工具"></a>下载安装工具</h4><p>打开SDK Manager 安装android NDK,CMake,LLDB</p>
 <ul>
 <li>android NDK:原生开发工具包</li>
@@ -111,6 +117,20 @@
 <h4 id="配置CMakeLists-txt文件路径"><a href="#配置CMakeLists-txt文件路径" class="headerlink" title="配置CMakeLists.txt文件路径"></a>配置CMakeLists.txt文件路径</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">externalNativeBuild &#123;</div><div class="line"></div><div class="line">    <span class="comment">// Encapsulates your CMake build configurations.</span></div><div class="line">    cmake &#123;</div><div class="line"></div><div class="line">      <span class="comment">// Provides a relative path to your CMake build script.</span></div><div class="line">      path <span class="string">"CMakeLists.txt"</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
 <h4 id="配置ABI"><a href="#配置ABI" class="headerlink" title="配置ABI"></a>配置ABI</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">ndk &#123;</div><div class="line">      <span class="comment">// Specifies the ABI configurations of your native</span></div><div class="line">      <span class="comment">// libraries Gradle should build and package with your APK.</span></div><div class="line">      abiFilters <span class="string">'x86'</span>, <span class="string">'x86_64'</span>, <span class="string">'armeabi'</span>, <span class="string">'armeabi-v7a'</span>,</div><div class="line">                   <span class="string">'arm64-v8a'</span></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
 <h4 id="库命名"><a href="#库命名" class="headerlink" title="库命名"></a>库命名</h4><p>在cmake脚本文件里通过add_library命令中指定库文件名字，其产生文件格式为<br>lib库名称.so<br>代码中通过 System.loadLibrary(“库名称”);来进行库的加载</p>
+<h4 id="旧NDK版本支持"><a href="#旧NDK版本支持" class="headerlink" title="旧NDK版本支持"></a>旧NDK版本支持</h4><p>在gradle.properties中添加配置android.useDeprecatedNdk=true </p>
+<h4 id="ndk-build构建"><a href="#ndk-build构建" class="headerlink" title="ndk-build构建"></a>ndk-build构建</h4><p>除了cmake方式，我们还可以使用ndk-build方式构建，在编译文件目录下增加Android.mk文件和Application.mk文件<br>在Android.mk中配置编译相关配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">LOCAL_PATH　:= $(call my-dir)</div><div class="line">// 设置工作目录，而my-dir则会返回Android.mk文件所在的目录</div><div class="line"></div><div class="line">include　$(CLEAR_VARS)</div><div class="line">// 清除几乎所有以LOCAL——PATH开头的变量（不包括LOCAL_PATH）</div><div class="line"></div><div class="line">LOCAL_MODULE := hello_jni</div><div class="line">// 设置模块的名称，即编译出来.so文件名</div><div class="line">// 注，要和上述步骤中build.gradle中NDK节点设置的名字相同</div><div class="line"></div><div class="line">LOCAL_SRC_FILES := test.cpp</div><div class="line">// 指定参与模块编译的C/C++源文件名</div><div class="line"></div><div class="line">include $(PREBUILT_SHARED_LIBRARY)</div><div class="line">// 生成预先构建共享库</div><div class="line"></div><div class="line">LOCAL_LDLIBS := -ljnigraphics -llog</div><div class="line">// 添加本地支持的动态库</div><div class="line"></div><div class="line">LOCAL_SHARED_LIBRARIES := skia_android</div><div class="line">//指定生成的静态库或者共享库在运行时依赖的共享库模块列表</div><div class="line"></div><div class="line">include $(BUILD_SHARED_LIBRARY)</div><div class="line">// 指定生成的共享库，静态库则为BUILD_STATIC_LIBRARY</div></pre></td></tr></table></figure></p>
+<p>在Application.mk文件中则配置项目相关信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">APP_PLATFORM := android-15</div><div class="line">//指定支持的版本</div><div class="line">APP_STL:=gnustl_static</div><div class="line">//指定运行库</div><div class="line">APP_ABI := armeabi</div><div class="line">//指定库支持的架构</div><div class="line">APP_CPPFLAGS := -frtti -std=c++11</div><div class="line">//指定相关配置</div></pre></td></tr></table></figure></p>
+<p>在gradle中指定Android.mk构建文件的路径<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">externalNativeBuild &#123;</div><div class="line">        ndkBuild &#123;</div><div class="line">            path &apos;jni/Android.mk&apos;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>最后通过cd命令到编译文件目录下通常为jni目录下执行ndk-build命令构建库文件即可打包成so包</p>
+<h4 id="开发流程"><a href="#开发流程" class="headerlink" title="开发流程"></a>开发流程</h4><ol>
+<li>在Java中声明Native方法（即需要调用的本地方法）</li>
+<li>javac编译上述 Java源文件得到 .class文件</li>
+<li>通过 javah 命令导出JNI的头文件（.h文件）</li>
+<li>使用 Java需要交互的本地代码 实现在 Java中声明的Native方法 </li>
+<li>编译.so库文件</li>
+</ol>
+<h4 id="注册JNI函数"><a href="#注册JNI函数" class="headerlink" title="注册JNI函数"></a>注册JNI函数</h4><p>有两种方式可以注册JNI函数，一种是静态注册，一种是动态注册，静态注册就像上面讲的通过javah得到对应的头文件，实现其函数即可，动态注册则是通过库加载调用的JNI_OnLoad()函数中调用JNIEnv的RegisterNatives方法来完成注册native方法和JNI函数的对应关系</p>
+<h4 id="c调用java代码"><a href="#c调用java代码" class="headerlink" title="c调用java代码"></a>c调用java代码</h4><p>通过FindClass()函数获取到对应的java类，然后通过GetMethodID()函数获取到对应的方法</p>
 
       
     </div>
